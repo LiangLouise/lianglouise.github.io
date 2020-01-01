@@ -11,10 +11,10 @@ script:
 deploy:
   provider: pages
   verbose: true
-  cleanup: false
+  skip_cleanup: true
   github_token: $GH_TOKEN
   keep_history: true
   target_branch: master # GitHub Page's files must be in master branch
   on:
     branch: develop
-  local-dir: public
+  local_dir: public

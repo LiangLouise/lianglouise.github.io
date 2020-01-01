@@ -10,9 +10,11 @@ script:
   - hexo generate # generate static files
 deploy:
   provider: pages
-  skip-cleanup: true
-  github-token: $GH_TOKEN
-  keep-history: true
+  verbose: true
+  cleanup: false
+  github_token: $GH_TOKEN
+  keep_history: true
+  target_branch: master # GitHub Page's files must be in master branch
   on:
     branch: develop
   local-dir: public

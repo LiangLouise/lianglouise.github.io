@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Roy&#39;s Repo</title>
+    <link>https://lianglouise.github.io/</link>
+    <description>Recent content on Roy&#39;s Repo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 31 Dec 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://lianglouise.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About Me</title>
+      <link>https://lianglouise.github.io/about/</link>
+      <pubDate>Tue, 20 Oct 2020 19:15:32 +0800</pubDate>
+      
+      <guid>https://lianglouise.github.io/about/</guid>
+      <description>I am a HBsc. in Co-op Computer Science Program, Software Engineering Stream at University of Toronto Scarborough.
+Currently, I am focusing on learning full stack development and Machine Learning related at UTSC.
+Education  September 2017 - August 2021 (Expected)  Candidate, Honors Bachelor of Science
+University of Toronto Scarborough
+ Computer Science Specialist Co-op Program, Software Development Stream, 3rd Year;
+ Received Entrance Scholarship issued in September 2017;
+ Current cGPA: 3.45.
+     Professional  Sep 2018 - Apr 2019  Co-op DevOps Specialist; Fleet Complete
+Collaborated with development team members to speed up CI &amp;amp; CD</description>
+    </item>
+    
+    <item>
+      <title>Hello-World!</title>
+      <link>https://lianglouise.github.io/post/hello_world/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://lianglouise.github.io/post/hello_world/</guid>
+      <description>Welcome to my github page.
+Finally! At the end of 2019, I managed to launched my personal blog with the help of Hexo and archer theme. with the help of Hugo and Fuji theme.
+I will share my naive thoughts and experiences on coding here. 😜
+Hope you could find something helpful and interesting.</description>
+    </item>
+    
+  </channel>
+</rss>

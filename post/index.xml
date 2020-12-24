@@ -6,7 +6,17 @@
     <description>Recent content in Posts on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 10 Nov 2020 23:13:55 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Dec 2020 22:00:17 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MapReduce - 6.824 Lab1</title>
+      <link>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</link>
+      <pubDate>Wed, 23 Dec 2020 22:00:17 -0500</pubDate>
+      
+      <guid>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</guid>
+      <description>&lt;p&gt;This is the first lab of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;http://research.google.com/archive/mapreduce-osdi04.pdf&#34; target=&#34;_blank&#34;&gt;MapReduce&lt;/a&gt;, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &amp;ldquo;cheap&amp;rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience on it.&lt;/p&gt;
+&lt;p&gt;A very classic use case of this framework is counting words in a large file, which is also what we are to implement.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</title>
       <link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</link>

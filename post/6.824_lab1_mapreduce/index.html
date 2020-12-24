@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.79.1" />
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/site.webmanifest">
+<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="shortcut icon" href="/favicon/favicon.ico">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="/favicon/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>MapReduce - 6.824 Lab1 - Roy&#39;s Repo</title>
+
+
+<meta name="author" content="Roy Liang" />
+
+
+<meta name="description" content="A minimal Hugo theme with nice theme color." />
+
+
+<meta name="keywords" content="Distributed System" />
+
+<meta property="og:title" content="MapReduce - 6.824 Lab1" />
+<meta property="og:description" content="This is the first lab of MIT 6.824, Distributed Systems. It is about the implementation of MapReduce, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &ldquo;cheap&rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience on it.
+A very classic use case of this framework is counting words in a large file, which is also what we are to implement." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab1_mapreduce/" />
+<meta property="og:image" content="https://lianglouise.github.io/img/og.png"/>
+<meta property="article:published_time" content="2020-12-23T22:00:17-05:00" />
+<meta property="article:modified_time" content="2020-12-23T22:00:17-05:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://lianglouise.github.io/img/og.png"/>
+
+<meta name="twitter:title" content="MapReduce - 6.824 Lab1"/>
+<meta name="twitter:description" content="This is the first lab of MIT 6.824, Distributed Systems. It is about the implementation of MapReduce, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &ldquo;cheap&rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience on it.
+A very classic use case of this framework is counting words in a large file, which is also what we are to implement."/>
+
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'G-BJCGN2DM5Q');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
+
+
+</head>
+
+<body data-theme="auto">
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
+            
+            <span class="title-sub">Share some thoughts</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://lianglouise.github.io/post/6.824_lab1_mapreduce/">MapReduce - 6.824 Lab1</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-12-23</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;860 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+
+    </div>
+    
+    
+    <div class="post-content markdown-body">
+        <p>This is the first lab of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. It is about the implementation of <a href="http://research.google.com/archive/mapreduce-osdi04.pdf" target="_blank">MapReduce</a>, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &ldquo;cheap&rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience on it.</p>
+<p>A very classic use case of this framework is counting words in a large file, which is also what we are to implement.</p>
+<h2 id="concept-behind-the-scene">Concept Behind the Scene</h2>
+<p>The overview of this framework is illustrated as the <code>Figure 1</code> in the <a href="http://research.google.com/archive/mapreduce-osdi04.pdf" target="_blank">paper</a>. There will be one <code>Master</code> and many <code>Worker</code>.</p>
+<p><code>Master</code> will assign tasks to <code>Worker</code> to execute and <code>monitor</code> the progress. It receives <code>m</code> input files and will generate <code>r</code> output files.</p>
+<p><code>Worker</code> mainly works on two things:</p>
+<ol>
+<li>During <code>Map</code> phase, each <code>Worker</code> reads one of <code>m</code> input files, apply it to user-defined <code>Map()</code> which returns some <code>&lt;key, value&gt;</code> pairs. Then save them into intermediate files. Usually, there will be <code>m</code> Map tasks in total.</li>
+<li>During <code>Reudece</code> phase, each <code>Worker</code> reads the <code>&lt;key, value&gt;</code> pairs in the corresponding intermediate files and apply them to <code>Reduce()</code> and save the result to output file.  There will be <code>r</code> Reduce tasks in total.</li>
+</ol>
+<h2 id="implementation-in-the-lab">Implementation in the Lab</h2>
+<p>We are required to implement four major components in the framework: <code>Task</code>, <code>RPC</code>, <code>Worker</code>and <code>Master</code> .</p>
+<h3 id="task">Task</h3>
+<p>This is a Go struct sent back-and-forth between <code>Master</code> and <code>Worker</code>.</p>
+<p><code>Master</code> -&gt; <code>Worker</code>: start a new task.</p>
+<p><code>Worker</code> -&gt; <code>Master</code>: report the task result.</p>
+<pre><code class="language-go">type MapReduceTask struct {
+	// 0: Map, 1: Reduce, 2: Exit, 3: Wait
+	TaskType int
+	// 0: Unassigned, 1: Assigned, 2: Finished
+	Status int
+	// Start Time
+	TimeStamp time.Time
+
+	// Index in the list of tasks
+	Index int
+
+	InputFiles []string
+	OutputFile []string
+}
+</code></pre>
+<p>For <code>Map</code> task, it&rsquo;s expected to have <code>1</code> file name in <code>InputFiles</code> and <code>nReduce</code> of file name in <code>OutputFile</code>.</p>
+<p>Similarly, for <code>Reduce</code> task, it&rsquo;s expected to have <code>nReduce</code> of file name in <code>InputFiles</code> and <code>1</code> file name in <code>OutputFile</code>.</p>
+<h3 id="rpc">RPC</h3>
+<p>Since <code>Master</code> and <code>Worker</code> are different processes, we are asked to use <a href="https://en.wikipedia.org/wiki/Remote_procedure_call" target="_blank">Remote procedure call</a> to send request and response between <code>Master</code> and <code>Worker</code>.</p>
+<p>In this lab we can create two RPC, one for requesting a new task and one for submitting a task:</p>
+<pre><code class="language-go">type RequestTaskArgs struct {}
+
+type RequestTaskReply struct {
+	NReduce int
+	Task    MapReduceTask
+}
+
+type SubmitTaskArgs struct {
+	Task MapReduceTask
+}
+
+// Here Master is always available 
+type SubmitTaskReply struct {}
+</code></pre>
+<h3 id="worker">Worker</h3>
+<p><code>worker</code> is kind of single thread. It keeps requesting new task, processing it, report it and exit when <code>master</code> sends signal to exit.</p>
+<pre><code class="language-go">func Worker(mapf func(string, string) []KeyValue, reducef func(string, []string) string) {
+	for {
+		args := RequestTaskArgs{}
+		reply := RequestTaskReply{}
+
+		res := call(&quot;Master.RequestTask&quot;, &amp;args, &amp;reply)
+		if !res {
+			break
+		}
+
+		switch reply.Task.TaskType {
+		case MAP:
+			doMap(&amp;reply, mapf)
+		case REDUCE:
+			doReduce(&amp;reply, reducef)
+		case WAIT:
+			time.Sleep(1 * time.Second)
+		case EXIT:
+			os.Exit(0)
+		}
+
+	}
+}
+</code></pre>
+<h3 id="master">Master</h3>
+<p>The responsibilities for <code>master</code> are:</p>
+<ol>
+<li>
+<p>assigning the tasks to different <code>worker</code>. And if some <code>worker</code> does not report task back after certain time (10 sec here), reassign the task to another <code>worker</code>;</p>
+</li>
+<li>
+<p>monitoring the progress. If all the map tasks are done, <code>worker</code> should start to assign reduce tasks. When all the reduce tasks are done, master needs to tell the worker to exit;</p>
+</li>
+<li>
+<p>validating the result. Only confirm the <code>worker</code>&rsquo;s output files are valid when the task is completed and submitted.</p>
+</li>
+</ol>
+<p>So the <code>Master</code> should be like below</p>
+<pre><code class="language-go">type Master struct {
+	inputFiles  []string
+	nReduce     int
+
+	mapTasks    []MapReduceTask
+	reduceTasks []MapReduceTask
+
+    // Increase by 1 when one mapTask done. The map Phase is done when mapDone == inputFiles
+	mapDone     int
+    // Increase by 1 when one reduceTask done. The reduce Phase is done when reduceDone == nReduce
+	reduceDone  int
+
+	// Each time allow one work to update
+	mutex       sync.Mutex
+}
+</code></pre>
+<p>and when initializing it:</p>
+<pre><code class="language-Go">func MakeMaster(files []string, nReduce int) *Master {
+	m := Master{
+		inputFiles:  files,
+		nReduce:     nReduce,
+		mapTasks:    make([]mapReduceTask, len(files)),
+		reduceTasks: make([]mapReduceTask, nReduce),
+		mapDone:     0,
+		reduceDone:  0,
+		mutex:       sync.Mutex{},
+	}
+	// Fill each task in array mapTasks with the input file name and itialize other fileds
+	// Collect arrray for InputFiles and OutputFile in two tasks array
+    
+    // ......
+	return &amp;m
+}
+</code></pre>
+<h3 id="tips">Tips</h3>
+<ol>
+<li><code>worker</code> sometimes fails when processing the task. It might happen to write result to output files halfway. To avoid those garbage output, <code>worker</code> should be designed to write to an temp file and only when the entire task gets submitted, master then marks them are valid output.</li>
+</ol>
+<pre><code class="language-go">// Worker create a new temp output file
+tmpFile, err := ioutil.TempFile(&quot;./&quot;, &quot;mr&quot;)
+
+// Master rename them when recv a submit request
+for _, file := range reply.Task.OutputFile {
+    // validName :=
+    // 		mapTask:    mr-&lt;mapTask_idx&gt;-&lt;reduceTask_idx&gt;
+    //		reduceTask: mr-out-&lt;reduceTask_idx&gt;
+    err := os.Rename(tempOut, validName)
+    if err != nil {
+			panic(err)
+    }
+}
+</code></pre>
+<ol start="2">
+<li>
+<p>During the map phase, <code>worker</code> should use <code>ihash(key) % NReduce</code> as the reduce task number to group the result <code>&lt;key, value&gt;</code> pair into the same array.</p>
+</li>
+<li>
+<p>All the field names in the RPC <code>Args</code> and <code>Reply</code> should begin with capital letter or Go will not send them.</p>
+</li>
+</ol>
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a>.</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>Pages</h3>
+        <ul>
+            
+            <li>
+                <a href="/">Home</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">Archives</a>
+            </li>
+            
+            <li>
+                <a href="/about/">About</a>
+            </li>
+            
+            <li>
+                <a href="/gpg_email/">Email</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>Links</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>Tags</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/distributed-system/">Distributed System</a>
+            </span>
+            
+            <span>
+                <a href="/tags/intro/">Intro</a>
+            </span>
+            
+            <span>
+                <a href="/tags/security/">security</a>
+            </span>
+            
+            <span>
+                <a href="/tags/web/">web</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    
+</aside>
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>Pages</h3>
+        <ul>
+            
+            <li>
+                <a href="/">Home</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">Archives</a>
+            </li>
+            
+            <li>
+                <a href="/about/">About</a>
+            </li>
+            
+            <li>
+                <a href="/gpg_email/">Email</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>Links</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>Tags</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/distributed-system/">Distributed System</a>
+            </span>
+            
+            <span>
+                <a href="/tags/intro/">Intro</a>
+            </span>
+            
+            <span>
+                <a href="/tags/security/">security</a>
+            </span>
+            
+            <span>
+                <a href="/tags/web/">web</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <span>&copy; 2020-2020
+                <a href="https://lianglouise.github.io/">Roy Liang</a>
+                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                | Powered by <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/combine/npm/medium-zoom@1.0.6,npm/lazysizes@5.2.2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+</body>
+
+</html>

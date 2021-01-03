@@ -6,7 +6,16 @@
     <description>Recent content in Distributed System on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 23 Dec 2020 22:00:17 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 02 Jan 2021 21:45:49 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Raft - 6.824 Lab2A 2B</title>
+      <link>https://lianglouise.github.io/post/6.824_lab2ab/</link>
+      <pubDate>Sat, 02 Jan 2021 21:45:49 -0500</pubDate>
+      
+      <guid>https://lianglouise.github.io/post/6.824_lab2ab/</guid>
+      <description>&lt;p&gt;This post is about part A and B of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. Here in these two part, we only discuss the section up to the end of section &lt;em&gt;5&lt;/em&gt; in the paper.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>MapReduce - 6.824 Lab1</title>
       <link>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</link>

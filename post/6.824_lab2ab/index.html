@@ -121,7 +121,7 @@
         <a href="https://lianglouise.github.io/post/6.824_lab2ab/">Raft - 6.824 Lab2A 2B</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-02</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1307 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-02</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1622 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
@@ -134,8 +134,8 @@
 <p>The system we are to build follows the rules illustrated as this chart in the paper:</p>
 <p><img class="img-zoomable" src="/imgs/raft/raft-chart.png" alt="raft-chart.png" />
 </p>
-<h2 id="part-a-election">Part A: Election</h2>
-<p>Raft uses an monophonically increasing integer as <code>term</code> number to tell different leaders. Each term, there is only allowed to have one <code>leader</code> to take the request and try to back up the request to the other nodes. And all other nodes become <code>follower</code> to receive log back up from leader and maintain a timer to start a leader election if not listening back from the leader after a certain time by converting itself to be an <code>candidate</code>.</p>
+<h2 id="part-a-election-and-state-transiting">Part A: Election And State Transiting</h2>
+<p>There are three different states in Raft: <code>leader</code>, <code>follower</code> and <code>candidate</code>. In a working Raft network, it is only allowed to have one <code>leader</code> to take the request and try to back up the request to the other nodes. And all other nodes become <code>follower</code> to receive log back up from leader and maintain a timer to start a leader election if not listening back from the leader after a certain time by converting itself to be an <code>candidate</code>.  And Raft uses an monophonically increasing integer as <code>term</code> number to tell different leaders.</p>
 <p><img class="img-zoomable" src="/imgs/raft/raft-state.png" alt="raft-state.png" />
 </p>
 <p>Following the state chart above and <code>RequestVoteRPC</code>, we can see what we need to implement:</p>
@@ -144,7 +144,6 @@
 <p>​	3) If unable to win the majority in the <code>electionTimeOut</code>, increase <code>term</code> by 1 and restart a leader election.</p>
 <p>Thus, the <code>Raft</code> struct should be defined as:</p>
 <pre><code class="language-go">const (
-	Undefined = -1
 	Follower  = iota
 	Leader
 	Candidate
@@ -175,16 +174,25 @@ type Raft struct {
 	voteCount int // Increase by 1 if revice a vote from a peer.
 }
 </code></pre>
+<p>A rule in the figure <em>2</em> that all the nodes must follow:</p>
+<p>​	<strong>If RPC request or response contains term T &gt; currentTerm: set currentTerm = T, convert to follower (§5.1)</strong></p>
+<p>So that term number can keep up-to-date in the entire network and an out-dated <code>leader</code> can know it should jump to a higher <code>term</code>.</p>
+<h3 id="election-restrictions">Election Restrictions</h3>
 <p>Besides, as the rules stated in the figure <em>2</em> of paper and section <em>5.4.1</em>, we have several rules to implement as election restriction.</p>
 <p>For <code>candidate</code>, it loses an election if one of the following happens:</p>
 <p>​	1) It&rsquo;s killed. <code>rf.killed() == true</code>;</p>
 <p>​	2) Some <code>RequestVoteRPCReply</code> has a higher term number than it&rsquo;s <code>currTerm</code>;</p>
 <p>​	3) Receive <code>AppendEntryRPC</code> with a higher term number than it&rsquo;s <code>currTerm</code>.</p>
 <p>For <code>follower</code>, it rejects the <code>RequestVoteRPC</code> if one of the following happens:</p>
-<p>​	1) the request from the <code>candidate</code> with lower term</p>
-<p>​	2) the request from the <code>candidate</code> which comes later and belongs to the same term</p>
-<p>​	3) the last entry having a higher term</p>
-<p>​	4) the logs longer than candidate when having the same term number</p>
+<p>​	1) the request from the <code>candidate</code> with a lower term;</p>
+<p>​	2) the request from the <code>candidate</code> which comes later and belongs to the same term;</p>
+<p>​	3) the last entry having a higher term;</p>
+<p>​	4) the logs longer than candidate when having the same term number.</p>
+<h3 id="votefor"><code>VoteFor</code></h3>
+<p>The <code>voteFor</code> should be carefully managed, as failing to follow the rule in the figure <em>2</em> would lead to unexpected election result, especially when the nodes need to use records to persisted record to reboot in the part C.</p>
+<p>If the node is a <code>candidate</code>, set its <code>voteFor = rf.me</code></p>
+<p>If the node receives a <code>RequestVoteRPC </code>  and replies <code>voteGranted == true</code>, then it should set its <code>voteFor = candidateId</code></p>
+<p>If the node becomes a followers only because receiving a <code>RPC</code> request from a node in a higher term and update itself to a <code>follower</code> , then it should set its <code>voteFor = -1</code></p>
 <h2 id="part-b-log-replication">Part B: Log Replication</h2>
 <p>In this part, <code>Raft</code> struct will receive logs from the test by <code>rf.Start()</code> to reach agreement among the peers and the log replication is one of the most important part of Raft.</p>
 <p>The logic is quite straightforward:</p>
@@ -209,14 +217,15 @@ type Raft struct {
 		reply.IsSuccess = false
 		reply.Term = rf.currTerm
 		return
-	} else if args.Term &gt;= rf.currTerm {
-        // Appeart a leader of higher term, convert to follower
-		rf.setStateFollower(args.Term)
-		// Reply with the updated term number
-		reply.Term = rf.currTerm
-	}
+	} else if args.Term &gt; rf.currTerm {
+        // See a higher term turn to follower of term
+		rf.setStateFollower(args.Term, -1)
+    } else {
+        // If same term just refresh the update time
+		rf.lastUpdate = time.Now()
+    }
+    
 	// Only with a valid term number, it should be considered as hearing from the leader
-	rf.lastUpdate = time.Now()
 
 	// Update rf.log[]
 	if args.PreLogIndex &gt; rf.lastApplied {
@@ -246,19 +255,34 @@ type Raft struct {
 <p>Split the <code>raft.go</code> into multiple go files by the RPC types, as for each RPC you may need one handler for <code>follower</code> and multiple functions for <code>leader</code>;</p>
 </li>
 <li>
+<p>For node state transiting, a good idea is to use set methods to group all the variables you need to update for state change so you won&rsquo;t miss some of them.</p>
+<p>Use changing to Follower as an example:</p>
+<pre><code class="language-go">func (rf *Raft) setStateFollower(term, voteFor int) {
+ rf.currTerm = term
+ rf.votedFor = voteFor
+ // Update last time hear from the leader
+ rf.state = Follower
+ rf.lastUpdate = time.Now()
+    // Start a new election timer
+ go rf.electionTimeOut(term)
+}
+</code></pre>
+</li>
+<li>
 <p>Use <code>sort.Slice()</code> to help <code>leader</code> find new <code>commitIndex</code>;</p>
 </li>
 <li>
-<p>Election and heartbeat timers are suggested to implement using <code>for {}</code> instead of <code>time.NewTimer</code>, like heartbeat:</p>
+<p>Election and heartbeat timers are suggested to implement using <code>for {}</code> instead of <code>time.NewTimer</code>. I also pass in a <code>term</code> to the timer so that when using set methods to update node&rsquo;s state, you don&rsquo;t have to warry about if you need to restart a new timer or not.</p>
+<p>Use heartbeat as an example:</p>
 <pre><code class="language-go">const (
  HeartbeatInterval = 120 * time.Millisecond
 )
    
-func (rf *Raft) broadcastHeartbeat() {
- for {
+func (rf *Raft) broadcastHeartbeat(term int) {
+ for !rf.killed() {
      rf.mu.Lock()
-     // Stop sent heartbeat if not a leader
-     if rf.state != Leader || rf.killed() {
+     // Stop sent heartbeats if not a leader or has jumped to another term
+     if rf.state != Leader || rf.currTerm &gt; term {
          rf.mu.Unlock()
          break
      }
@@ -270,13 +294,13 @@ func (rf *Raft) broadcastHeartbeat() {
          if i == rf.me {
              continue
          }
-         go rf.sendAppendEntries(i, &amp;AppendEntriesArgs{})
+            // You can construct AppendEntriesArgs here or in the function
+         go rf.sendAppendEntries(i)
      }
      rf.mu.Unlock()
      time.Sleep(HeartbeatInterval)
  }
 }
-   
 </code></pre>
 </li>
 <li>
@@ -286,6 +310,7 @@ func (rf *Raft) broadcastHeartbeat() {
 <h2 id="references">References</h2>
 <ol>
 <li><a href="http://thesecretlivesofdata.com/raft/" target="_blank">Raft Visualization</a></li>
+<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students' Guide to Raft</a></li>
 </ol>
     </div>
 </article>

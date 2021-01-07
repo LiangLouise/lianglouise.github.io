@@ -6,7 +6,16 @@
     <description>Recent content in Distributed System on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 02 Jan 2021 21:45:49 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 07 Jan 2021 00:21:03 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Raft - 6.824 Lab2C</title>
+      <link>https://lianglouise.github.io/post/6.824_lab2c/</link>
+      <pubDate>Thu, 07 Jan 2021 00:21:03 -0500</pubDate>
+      
+      <guid>https://lianglouise.github.io/post/6.824_lab2c/</guid>
+      <description>&lt;p&gt;This post is about part C of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. For previous two parts, please refer to &lt;a href=&#34;https://lianglouise.github.io/post/6.824_lab2ab/&#34;&gt;Part A and B&lt;/a&gt;. In this one we are focusing on Persist in &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. The implementation would mostly follow the figure &lt;em&gt;2&lt;/em&gt; in the paper as well.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Raft - 6.824 Lab2A 2B</title>
       <link>https://lianglouise.github.io/post/6.824_lab2ab/</link>

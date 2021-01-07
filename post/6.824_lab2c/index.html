@@ -121,7 +121,7 @@
         <a href="https://lianglouise.github.io/post/6.824_lab2c/">Raft - 6.824 Lab2C</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1064 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1061 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
@@ -131,10 +131,17 @@
 <h2 id="persist">Persist</h2>
 <p>It&rsquo;s inevitable to have some machines crashed or rebooted in the clusters. We need to persist some important state so that nodes can begin at the place it crashed and rejoin the cluster again.</p>
 <p>As <em>Persistent state on all servers</em> mentioned in figure <em>2</em>, there three state to persist:</p>
-<pre><code>* `currentTerm`: This will avoid the node to vote a `candidate` with a smaller `term`
-* `votedFor`: this prevent a node from voting multiple times in an election
-* `log[]`: if the node has the majority of committed logs, we need to ensure the future `leader` can see them
-</code></pre>
+<ul>
+<li>
+<p><code>currentTerm</code>: This will avoid the node to vote a <code>candidate</code> with a smaller <code>term</code></p>
+</li>
+<li>
+<p><code>votedFor</code>: this prevent a node from voting multiple times in an election</p>
+</li>
+<li>
+<p><code>log[]</code>: if the node has the majority of committed logs, we need to ensure the future <code>leader</code> can see them</p>
+</li>
+</ul>
 <h2 id="implementation-in-the-lab">Implementation in the Lab</h2>
 <p>Following the comments in function <code>persist()</code> and <code>readPersist()</code> of <em>raft.go</em>, we can fill the functions.</p>
 <pre><code class="language-go">//

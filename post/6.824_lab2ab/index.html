@@ -37,13 +37,13 @@
 <meta property="og:title" content="Raft - 6.824 Lab2A 2B" />
 <meta property="og:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="lianglouise.github.io/post/6.824_lab2ab/" />
-<meta property="og:image" content="lianglouise.github.io/img/og.png"/>
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab2ab/" />
+<meta property="og:image" content="https://lianglouise.github.io/img/og.png"/>
 <meta property="article:published_time" content="2021-01-02T21:45:49-05:00" />
 <meta property="article:modified_time" content="2021-01-02T21:45:49-05:00" />
 
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="lianglouise.github.io/img/og.png"/>
+<meta name="twitter:image" content="https://lianglouise.github.io/img/og.png"/>
 
 <meta name="twitter:title" content="Raft - 6.824 Lab2A 2B"/>
 <meta name="twitter:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper."/>
@@ -64,7 +64,7 @@
 
 
 
-<link rel="stylesheet" href="/lianglouise.github.io/assets/css/fuji.min.css" />
+<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
 
 
 
@@ -102,7 +102,7 @@
     <header>
     <div class="container-lg clearfix">
         <div class="col-12 header">
-            <a class="title-main" href="lianglouise.github.io/">Roy&#39;s Repo</a>
+            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
             
             <span class="title-sub">Share some thoughts</span>
             
@@ -118,10 +118,10 @@
 <article>
     
     <h2 class="post-item post-title">
-        <a href="lianglouise.github.io/post/6.824_lab2ab/">Raft - 6.824 Lab2A 2B</a>
+        <a href="https://lianglouise.github.io/post/6.824_lab2ab/">Raft - 6.824 Lab2A 2B</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-02</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1622 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/lianglouise.github.io/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-02</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1622 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
@@ -132,11 +132,11 @@
 <p>In GFS or MapReduce, we have one single <code>Master</code> to manage the entire system. However, there is still a chance that the <code>Master</code> encounters some error or other issues. We than need a cluster to avoid this single point failure. And again, as in the distributed system, it&rsquo;s inevitable to have some nodes failed. We need a way to keep the requests and results  contestant across the cluster as recovery and always have one leader to take the requests from the users.</p>
 <p>Raft is a consensus algorithm for managing a replicated log. Here <em>log</em> refers to requests to be backed up in the cluster. Each node maintains a list of log of the same order. As long as <em>morn than half</em> of the nodes are alive in the network, the cluster can still be functional.</p>
 <p>The system we are to build follows the rules illustrated as this chart in the paper:</p>
-<p><img class="img-zoomable" src="/lianglouise.github.io/imgs/raft/raft-chart.png" alt="raft-chart.png" />
+<p><img class="img-zoomable" src="/imgs/raft/raft-chart.png" alt="raft-chart.png" />
 </p>
 <h2 id="part-a-election-and-state-transiting">Part A: Election And State Transiting</h2>
 <p>There are three different states in Raft: <code>leader</code>, <code>follower</code> and <code>candidate</code>. In a working Raft network, it is only allowed to have one <code>leader</code> to take the request and try to back up the request to the other nodes. And all other nodes become <code>follower</code> to receive log back up from leader and maintain a timer to start a leader election if not listening back from the leader after a certain time by converting itself to be an <code>candidate</code>.  And Raft uses an monophonically increasing integer as <code>term</code> number to tell different leaders.</p>
-<p><img class="img-zoomable" src="/lianglouise.github.io/imgs/raft/raft-state.png" alt="raft-state.png" />
+<p><img class="img-zoomable" src="/imgs/raft/raft-state.png" alt="raft-state.png" />
 </p>
 <p>Following the state chart above and <code>RequestVoteRPC</code>, we can see what we need to implement:</p>
 <p>​	1) Initially, Set all the <code>Raft</code> struct to be <code>follower</code>. Each of them start a timer <code>electionTimeOut</code> of random duration. After timer time out, <code>follower</code> turns itself to be <code>candidate</code>, increase <code>term</code> by 1 and start a leader election;</p>
@@ -333,19 +333,19 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         <ul>
             
             <li>
-                <a href="lianglouise.github.io/">Home</a>
+                <a href="/">Home</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/archives/">Archives</a>
+                <a href="/archives/">Archives</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/about/">About</a>
+                <a href="/about/">About</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/gpg_email/">Email</a>
+                <a href="/gpg_email/">Email</a>
             </li>
             
         </ul>
@@ -371,19 +371,19 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         <div>
             
             <span>
-                <a href="lianglouise.github.io/tags/distributed-system/">Distributed System</a>
+                <a href="/tags/distributed-system/">Distributed System</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/intro/">Intro</a>
+                <a href="/tags/intro/">Intro</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/security/">security</a>
+                <a href="/tags/security/">security</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/web/">web</a>
+                <a href="/tags/web/">web</a>
             </span>
             
         </div>
@@ -413,19 +413,19 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         <ul>
             
             <li>
-                <a href="lianglouise.github.io/">Home</a>
+                <a href="/">Home</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/archives/">Archives</a>
+                <a href="/archives/">Archives</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/about/">About</a>
+                <a href="/about/">About</a>
             </li>
             
             <li>
-                <a href="lianglouise.github.io/gpg_email/">Email</a>
+                <a href="/gpg_email/">Email</a>
             </li>
             
         </ul>
@@ -451,19 +451,19 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         <div>
             
             <span>
-                <a href="lianglouise.github.io/tags/distributed-system/">Distributed System</a>
+                <a href="/tags/distributed-system/">Distributed System</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/intro/">Intro</a>
+                <a href="/tags/intro/">Intro</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/security/">security</a>
+                <a href="/tags/security/">security</a>
             </span>
             
             <span>
-                <a href="lianglouise.github.io/tags/web/">web</a>
+                <a href="/tags/web/">web</a>
             </span>
             
         </div>
@@ -481,7 +481,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         <div class="col-12 footer">
             
             <span>&copy; 2020-2021
-                <a href="lianglouise.github.io/">Roy Liang</a>
+                <a href="https://lianglouise.github.io/">Roy Liang</a>
                  | <a href="https://github.com/itsme/my_blog">Source code</a> 
                 | Powered by <a href="https://github.com/amzrk2/hugo-theme-fuji/"
                    target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
@@ -498,7 +498,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
 
 
 
-<script defer src="/lianglouise.github.io/assets/js/fuji.min.js"></script>
+<script defer src="/assets/js/fuji.min.js"></script>
 
 
 </body>

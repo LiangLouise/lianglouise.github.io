@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>security on Roy&#39;s Repo</title>
-    <link>https://lianglouise.github.io/tags/security/</link>
+    <link>http://royliang.me/tags/security/</link>
     <description>Recent content in security on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 10 Nov 2020 23:13:55 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/security/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 10 Nov 2020 23:13:55 -0500</lastBuildDate><atom:link href="http://royliang.me/tags/security/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</title>
-      <link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</link>
+      <link>http://royliang.me/post/some_practice_on_implementing_signal_protocol_with_python_2/</link>
       <pubDate>Tue, 10 Nov 2020 23:13:55 -0500</pubDate>
       
-      <guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</guid>
+      <guid>http://royliang.me/post/some_practice_on_implementing_signal_protocol_with_python_2/</guid>
       <description>&lt;p&gt;After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.&lt;/p&gt;
 &lt;p&gt;So what&amp;rsquo;s next?&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Some Practice on Implementing Signal Protocol With Python (1): X3DH</title>
-      <link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</link>
+      <link>http://royliang.me/post/some_practice_on_implementing_signal_protocol_with_python_1/</link>
       <pubDate>Tue, 20 Oct 2020 18:27:11 -0400</pubDate>
       
-      <guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</guid>
+      <guid>http://royliang.me/post/some_practice_on_implementing_signal_protocol_with_python_1/</guid>
       <description>&lt;p&gt;Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - &lt;a href=&#34;https://signal.org/docs/&#34; target=&#34;_blank&#34;&gt;Signal Protocol&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     

@@ -2,35 +2,35 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Distributed System on Roy&#39;s Repo</title>
-    <link>https://lianglouise.github.io/tags/distributed-system/</link>
+    <link>http://royliang.me/tags/distributed-system/</link>
     <description>Recent content in Distributed System on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 07 Jan 2021 00:21:03 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 07 Jan 2021 00:21:03 -0500</lastBuildDate><atom:link href="http://royliang.me/tags/distributed-system/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Raft - 6.824 Lab2C</title>
-      <link>https://lianglouise.github.io/post/6.824_lab2c/</link>
+      <link>http://royliang.me/post/6.824_lab2c/</link>
       <pubDate>Thu, 07 Jan 2021 00:21:03 -0500</pubDate>
       
-      <guid>https://lianglouise.github.io/post/6.824_lab2c/</guid>
-      <description>&lt;p&gt;This post is about part C of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. For previous two parts, please refer to &lt;a href=&#34;https://lianglouise.github.io/post/6.824_lab2ab/&#34;&gt;Part A and B&lt;/a&gt;. In this one we are focusing on Persist in &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. The implementation would mostly follow the figure &lt;em&gt;2&lt;/em&gt; in the paper as well.&lt;/p&gt;</description>
+      <guid>http://royliang.me/post/6.824_lab2c/</guid>
+      <description>&lt;p&gt;This post is about part C of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. For previous two parts, please refer to &lt;a href=&#34;http://royliang.me/post/6.824_lab2ab/&#34;&gt;Part A and B&lt;/a&gt;. In this one we are focusing on Persist in &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. The implementation would mostly follow the figure &lt;em&gt;2&lt;/em&gt; in the paper as well.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Raft - 6.824 Lab2A 2B</title>
-      <link>https://lianglouise.github.io/post/6.824_lab2ab/</link>
+      <link>http://royliang.me/post/6.824_lab2ab/</link>
       <pubDate>Sat, 02 Jan 2021 21:45:49 -0500</pubDate>
       
-      <guid>https://lianglouise.github.io/post/6.824_lab2ab/</guid>
+      <guid>http://royliang.me/post/6.824_lab2ab/</guid>
       <description>&lt;p&gt;This post is about part A and B of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. Here in these two part, we only discuss the section up to the end of section &lt;em&gt;5&lt;/em&gt; in the paper.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>MapReduce - 6.824 Lab1</title>
-      <link>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</link>
+      <link>http://royliang.me/post/6.824_lab1_mapreduce/</link>
       <pubDate>Wed, 23 Dec 2020 22:00:17 -0500</pubDate>
       
-      <guid>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</guid>
+      <guid>http://royliang.me/post/6.824_lab1_mapreduce/</guid>
       <description>&lt;p&gt;This is the first lab of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;http://research.google.com/archive/mapreduce-osdi04.pdf&#34; target=&#34;_blank&#34;&gt;MapReduce&lt;/a&gt;, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &amp;ldquo;cheap&amp;rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience of it.&lt;/p&gt;
 &lt;p&gt;A very classic use case of this framework is counting words in a large file, which is also what we are to implement.&lt;/p&gt;</description>
     </item>

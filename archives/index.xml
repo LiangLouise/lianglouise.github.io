@@ -2,9 +2,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Archives on Roy&#39;s Repo</title>
-    <link>https://lianglouise.github.io/archives/</link>
+    <link>lianglouise.github.io/archives/</link>
     <description>Recent content in Archives on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language><atom:link href="https://lianglouise.github.io/archives/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language><atom:link href="lianglouise.github.io/archives/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

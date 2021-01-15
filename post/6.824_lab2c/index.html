@@ -214,7 +214,7 @@ if firstIndex != -1 {
     reply.IsSuccess = false
     reply.ConflictIndex = len(rf.log)
     reply.ConflictTerm = -1
-args.PreLogIndex, lastIdx)
+	args.PreLogIndex, lastIdx)
 } else if rf.log[args.PreLogIndex].Term != args.PreLogTerm {
     // Unable to reach agreement at the PreLogIndex. Ask for decrement
     reply.IsSuccess = false

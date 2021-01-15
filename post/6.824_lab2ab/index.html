@@ -263,7 +263,7 @@ type Raft struct {
  // Update last time hear from the leader
  rf.state = Follower
  rf.lastUpdate = time.Now()
-    // Start a new election timer
+ // Start a new election timer
  go rf.electionTimeOut(term)
 }
 </code></pre>
@@ -287,7 +287,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
          break
      }
            
-        // Some other operations in between...
+     // Some other operations in between...
            
      // Send heartbeat to all other peers
      for i, _ := range rf.peers {

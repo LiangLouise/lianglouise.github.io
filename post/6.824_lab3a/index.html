@@ -112,12 +112,14 @@
         <a href="https://lianglouise.github.io/post/6.824_lab3a/">KV Raft - 6.824 Lab3C</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;731 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1289 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
     <div class="post-content markdown-body">
         <p>This post is about part A of Lab3 of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag <a href="/tags/distributed-system/">Distributed System</a>. In this post, we are to build a fault tolerant key-value services on top of <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft</a>.</p>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme: "neutral" });</script>
 <h2 id="overview">Overview</h2>
 <p>The functions we need to achieve are in fact very simple. It will need three functions:</p>
 <ol>
@@ -179,25 +181,113 @@ func (ck *Clerk) Get(key string) string {
 <p>In the entire server cluster, only the server with the leader of Raft services can procced the requests from clients and send back the actual data to client. All other servers acts as back-up, only proceeding the request sent from the channel <code>kv.applyCh</code> and rejecting immediately any requests if finding itself not a leader in Raft services after calling <code>rf.Start()</code></p>
 <p>Those we can illustrate the logic of the cluster as below:</p>
 <div class="mermaid">
-graph LR
+graph TB
 	client
-	kv1[KV Leader]
-	kv2[KV Follower 1]
-	kv3[KV Follower 2]
-    rf_l("Raft Leader")
-    rf_1("Raft Follower 1")
-    rf_2("Raft Follower 2")
+	subgraph cluster
+		kv1[KV Leader]
+        kv2[KV Follower 1]
+        kv3[KV Follower 2]
+        rf_l(["Raft Leader"])
+        rf_1(["Raft Follower 1"])
+        rf_2(["Raft Follower 2"])
+	end
     client --> | a1. New request| kv1
     kv1  --> |a2. Ask to log the requst| rf_l
     rf_l --> |a3. Append the new log| rf_1 & rf_2
-	rf_l --> |a4. Log saved, complete the request in the log | kv1
+	rf_l --> |a4. complete the request from apply | kv1
 	rf_1 --> |a5. Send backed up load to its kv server | kv2
 	rf_2 --> |"as (a5)"| kv3
 	kv1  --> |"a6. Success (with data return)"| client
 	client --> | b1. New request| kv2
 	kv2 --> | b2. Falied due to not leader| client
 </div>
->  In section *a*, the request is sent to leader and got proceeded in the all the nodes in the cluster but in section *b*, the request is rejected as `KV Follower 1` is not the leader in the cluster.
+<blockquote>
+<p>In section <em>a</em>, the request is sent to leader and got proceeded in the all the nodes in the cluster but in section <em>b</em>, the request is rejected as <code>KV Follower 1</code> is not the leader in the cluster.</p>
+</blockquote>
+<p>Besides, another requirement is that duplicate requests must be omitted. Thus for each client, we need to cache the last request id it made.</p>
+<p>Thus we can have the struct <code>KVServer</code> defined as:</p>
+<pre><code class="language-go">type KVServer struct {
+	mu   sync.Mutex
+	me   int
+	dead int32 // set by Kill()
+
+	// Raft Server
+	rf           *raft.Raft
+	applyCh      chan raft.ApplyMsg
+	persister    *raft.Persister
+    // snapshot if log grows this big
+	maxraftstate int
+
+	// sotre the key/value pairs in a map
+	data       map[string]string
+
+	// keep a chan for each request submitted to raft. Delete if timeout or it's done
+	waitChs map[int64]chan ApplyReply
+
+	// cache the last request invoked by the client
+	lastApplies map[int64]int64
+}
+</code></pre>
+<h3 id="leader-proceeding-the-requests">Leader Proceeding the Requests</h3>
+<p>All the operation won&rsquo;t be applied to <code>kv.data</code> directly after receiving the request. Leader <code>KVServer</code> will first submit the request to Raft by <code>rf.Start()</code> and make a wait channel in  <code>kv.waitChs</code> for this new request, for channel we need a timer to ensure that the goroutine <code>Get()</code> and <code>PutAppend()</code> will stop if taking too long to execute the request and can know the result of the execution without requiring additional lock for reading/updating the data. All the <code>KVServer</code> will execute the operation until they got the committed log sent back by Raft through <code>kv.applyCh</code> and send the execution result through <code>kv.waitChs</code> the goroutine <code>Get()</code> and <code>PutAppend()</code>.</p>
+<p>You also need to define a new struct or add some new fields to <code>ApplyMsg</code> , so that <code>KVServer</code> can know request client id, request message id and other data help you identify duplications.</p>
+<p>Then we can have:</p>
+<pre><code class="language-go">func (kv *KVServer) start(args applyArg) (rep ApplyReply) {
+	index, term, isLeader := kv.rf.Start(args)
+	
+    // Reject if not leader
+	if !isLeader {
+		return ApplyReply{Err: ErrWrongLeader}
+	}
+
+	kv.lock()
+    
+	// Create a channel to watch if raft has reached 
+    // agreement for this request
+	ch := make(chan ApplyReply)
+	kv.waitChs[args.MsgId] = ch
+	kv.unlock()
+
+	// Wait until either timeout or getting response
+    // from WaitCh
+}
+
+
+// goroutine to monitor the kv.applyCh	
+func (kv *KVServer) waitApplyChan() {
+	for !kv.killed() {
+        // Wait the new logged request from raft
+		msg := &lt;-kv.applyCh	
+		submittedReq := msg.Command
+        
+        // acquire the log as we need to update and read kv.data
+		kv.lock()
+        
+        // Check if it's a duplicate msg have seen before
+        // You have to check it here since, the followers
+        // can only see new req through kv.applyCh
+		
+        // With the op value and key(/value) in the req, update your data
+        
+		// use the waitCh to tell KVServer to send back the response 
+        // status cide and retrived data to client
+		if ch, ok := kv.waitChs[submittedReq.MsgId]; ok {
+            ch &lt;- ApplyReply{Err: err, Value: value}
+		}
+
+		kv.unlock()
+	}
+}
+</code></pre>
+<h3 id="changes-in-raft">Changes in Raft</h3>
+<p>A very important thing to remember is that in this Lab3A is that <code>KVServer</code> will lose all the data once it dies. The way to recover to the previous state are two:</p>
+<ul>
+<li>Raft replays all the committed logs it has from 0 to <code>rf.commitIndex</code>;</li>
+<li>Use RPC <code>InstallSnapshot</code> which we are to implement in the next lab.</li>
+</ul>
+<p>Thus my solution for recovering the data of <code>kv</code> is that <code>rf.lastApplied</code> will be reset to 0 once rebooting, which indicates that <code>kv</code> has no data at all. So once Raft needs to send new <code>ApplyMsg</code> to <code>kv</code>, we should send <code>rf.log[rf.lastApplied+1:newCommitIndex+1]</code> and mark all the logs whose index 
+\(\leq\)
+ <code>oldCommitIndex</code> invalid data as tester has seen these logs already.</p>
     </div>
 </article>
 
@@ -279,7 +369,12 @@ graph LR
   <ul>
     <li><a href="#overview">Overview</a></li>
     <li><a href="#client-side">Client Side</a></li>
-    <li><a href="#server-side">Server Side</a></li>
+    <li><a href="#server-side">Server Side</a>
+      <ul>
+        <li><a href="#leader-proceeding-the-requests">Leader Proceeding the Requests</a></li>
+        <li><a href="#changes-in-raft">Changes in Raft</a></li>
+      </ul>
+    </li>
   </ul>
 </nav></div>
 </aside>
@@ -367,7 +462,12 @@ graph LR
   <ul>
     <li><a href="#overview">Overview</a></li>
     <li><a href="#client-side">Client Side</a></li>
-    <li><a href="#server-side">Server Side</a></li>
+    <li><a href="#server-side">Server Side</a>
+      <ul>
+        <li><a href="#leader-proceeding-the-requests">Leader Proceeding the Requests</a></li>
+        <li><a href="#changes-in-raft">Changes in Raft</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
     </div>
@@ -381,9 +481,9 @@ graph LR
     <div class="container-lg clearfix">
         <div class="col-12 footer">
             
-            <span>&copy; 2020-2021
+            <span>&copy; 2019-2021
                 <a href="https://lianglouise.github.io/">Roy Liang</a>
-                 | <a href="https://github.com/itsme/my_blog">Source code</a> 
+                 | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
                 | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
                    target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
                                                     target="_blank">Hugo</a> 
@@ -401,6 +501,15 @@ graph LR
 
 
 <script defer src="/assets/js/fuji.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body);"
+></script>
+
 
 
 </body>

@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#ffffff">
 
 
-<title>web - Roy&#39;s Repo</title>
+<title>KV Raft - 6.824 Lab3C - Roy&#39;s Repo</title>
 
 
 <meta name="author" content="Roy Liang" />
@@ -32,11 +32,14 @@
 <meta name="description" content="A minimal Hugo theme with nice theme color." />
 
 
+<meta name="keywords" content="Distributed System" />
 
-<meta property="og:title" content="web" />
-<meta name="twitter:title" content="web" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://lianglouise.github.io/tags/web/" /><meta name="twitter:card" content="summary" /><meta property="og:updated_time" content="2020-11-10T23:13:55-05:00" />
+
+<meta property="og:title" content="KV Raft - 6.824 Lab3C" />
+<meta name="twitter:title" content="KV Raft - 6.824 Lab3C" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab3a/" /><meta property="og:description" content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft." />
+<meta name="twitter:description" content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2021-02-10T23:44:05-05:00" /><meta property="article:modified_time" content="2021-02-10T23:44:05-05:00" />
 
 
 <style>
@@ -103,46 +106,85 @@
             
             <div class="col-12 col-md-9 float-left content">
                 
-
-<div class="page-info">
-    <span>Posts with the tag web: </span>
-</div>
-
-
-
-<div class="post">
+<article>
+    
     <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/">Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</a>
+        <a href="https://lianglouise.github.io/post/6.824_lab3a/">KV Raft - 6.824 Lab3C</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-11-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1099 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/web">web</a>&nbsp;<a href="/tags/security">security</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;517 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
-    <div class="post-item post-summary markdown-body">
-        <p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.</p>
-<p>So what&rsquo;s next?</p>
+    
+    <div class="post-content markdown-body">
+        <p>This post is about part A of Lab3 of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag <a href="/tags/distributed-system/">Distributed System</a>. In this post, we are to build a fault tolerant key-value services on top of <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft</a>.</p>
+<h2 id="overview">Overview</h2>
+<p>The functions we need to achieve are in fact very simple. It will need three functions:</p>
+<ol>
+<li><code>Put(key, value)</code>: Create a new key-value pair. Replace with the <code>vlaue</code> if the keys exists in the map;</li>
+<li><code>Append(key, value)</code>: If the <code>key</code> exists in the map, append <code>value</code> to the end of old value. If not, do as what <code>Put()</code> does;</li>
+<li><code>Get(key)</code>: Return the value if <code>key</code> exists in the map. Otherwise, return an empty string.</li>
+</ol>
+<p>If it&rsquo;s a singe server app, it won&rsquo;t take much time to implement. However, for fault tolerance, we will have to maintain multiple kv servers so that the service is available. Thus the real problem now is how to coordinate and synchronize the data between the servers through Raft.</p>
+<p><img class="img-zoomable" src="imgs/kvraft/kvraft.png" alt="kvraft" />
+</p>
+<p>As diagram illustrated above, we will have a server cluster, where raft service can see each other to do the election and log replications but the kv server can only communicate with its only Raft service in the cluster. Clients will randomly send requests to any kv servers. However, only the kv server whose raft is the leader will proceed the request and send back the data. All other kv servers will reject the request and ask the client to try other kv server.</p>
+<h2 id="client">Client</h2>
+<p>Let us begin with something easy first. The job of client is very simple, sending requests to one kv server, waiting for response. If timeout or receive any error, retry with other kv server.</p>
+<p>As we will have multiple clients running parallelly, to make sure it&rsquo;s able to know which client sent the request. We will assign each client an ID generated by <code>nrand()</code>. And there is also a chance that the same request might be sent multiple times. To identify the duplicate requests, each request should have an ID generated by <code>nrand()</code>, so that kv server is able to recognize the duplicate requests.</p>
+<p>Besides, to speed up the later requests, the client can cache the last seen leader ID (which is basically the index of server in <code>ck.servers</code>), so it doesn&rsquo;t have to try from the first server.</p>
+<p>Thus we can define the client as below:</p>
+<pre><code class="language-go">type Clerk struct {
+	servers   []*labrpc.ClientEnd
+	serverNum int
+    
+	clientId int64 // client's own uid
+    
+	lastLeaderId int // The leader id last heard
+}
+</code></pre>
+<p>When clients need to send the <code>Get</code> or <code>PutAppend</code> request, we can have <code>Get</code> defined like below as an example:</p>
+<pre><code class="language-go">// common.go
+type GetArgs struct {
+	MsgId    int64
+	ClientId int64
+	Key      string
+}
+
+type GetArgs struct {
+	Key   string
+	Value string
+    Err   string
+}
+
+// client.go
+func (ck *Clerk) Get(key string) string {
+    var reply GetReply
+	args := GetArgs{
+		MsgId:    nrand(),
+		ClientId: ck.clientId,
+		Key:      key,
+	}
+    
+    for {
+        // Send RPC
+        ok := ck.servers[leaderId].Call(&quot;KVServer.Get&quot;, &amp;args, &amp;reply)
+       	// If timeout, retry
+        
+        // either return or retry based on reply.Err
+    }
+}
+</code></pre>
     </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a>.</p>
+    </blockquote>
 </div>
-
-<div class="post">
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/">Some Practice on Implementing Signal Protocol With Python (1): X3DH</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-10-20</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1636 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/web">web</a>&nbsp;<a href="/tags/security">security</a>&nbsp;</span>
-
-    </div>
-    <div class="post-item post-summary markdown-body">
-        <p>Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - <a href="https://signal.org/docs/" target="_blank">Signal Protocol</a>.</p>
-    </div>
-</div>
-
-
-
-
-
-
-
 
 
 
@@ -209,9 +251,13 @@
             
         </div>
     </div>
-    
-    
-    
+    <div class="sidebar-item sidebar-toc">
+        <h3>TOC</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#client">Client</a></li>
+  </ul>
+</nav></div>
 </aside>
         </div>
         <div class="btn">
@@ -287,6 +333,18 @@
             </span>
             
         </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>TOC</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#client">Client</a></li>
+  </ul>
+</nav>
     </div>
     
     

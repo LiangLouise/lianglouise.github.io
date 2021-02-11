@@ -34,20 +34,12 @@
 
 <meta name="keywords" content="Distributed System" />
 
+
 <meta property="og:title" content="Raft - 6.824 Lab2A 2B" />
-<meta property="og:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper." />
+<meta name="twitter:title" content="Raft - 6.824 Lab2A 2B" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab2ab/" />
-<meta property="og:image" content="https://lianglouise.github.io/img/og.png"/>
-<meta property="article:published_time" content="2021-01-02T21:45:49-05:00" />
-<meta property="article:modified_time" content="2021-01-02T21:45:49-05:00" />
-
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://lianglouise.github.io/img/og.png"/>
-
-<meta name="twitter:title" content="Raft - 6.824 Lab2A 2B"/>
-<meta name="twitter:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper."/>
-
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab2ab/" /><meta property="og:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper." />
+<meta name="twitter:description" content="This post is about part A and B of Lab2 of MIT 6.824, Distributed Systems. It is about the implementation of Raft. Here in these two part, we only discuss the section up to the end of section 5 in the paper." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2021-01-02T21:45:49-05:00" /><meta property="article:modified_time" content="2021-01-02T21:45:49-05:00" />
 
 
 <style>
@@ -98,7 +90,6 @@
     }
   }
 </script>
-
     <header>
     <div class="container-lg clearfix">
         <div class="col-12 header">
@@ -125,18 +116,17 @@
 
     </div>
     
-    
     <div class="post-content markdown-body">
         <p>This post is about part A and B of Lab2 of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. It is about the implementation of <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft</a>. Here in these two part, we only discuss the section up to the end of section <em>5</em> in the paper.</p>
 <h2 id="brief-idea">Brief Idea</h2>
 <p>In GFS or MapReduce, we have one single <code>Master</code> to manage the entire system. However, there is still a chance that the <code>Master</code> encounters some error or other issues. We than need a cluster to avoid this single point failure. And again, as in the distributed system, it&rsquo;s inevitable to have some nodes failed. We need a way to keep the requests and results  contestant across the cluster as recovery and always have one leader to take the requests from the users.</p>
 <p>Raft is a consensus algorithm for managing a replicated log. Here <em>log</em> refers to requests to be backed up in the cluster. Each node maintains a list of log of the same order. As long as <em>morn than half</em> of the nodes are alive in the network, the cluster can still be functional.</p>
 <p>The system we are to build follows the rules illustrated as this chart in the paper:</p>
-<p><img class="img-zoomable" src="/imgs/raft/raft-chart.png" alt="raft-chart.png" />
+<p><img class="img-zoomable" src="imgs/raft/raft-chart.png" alt="raft-chart.png" />
 </p>
 <h2 id="part-a-election-and-state-transiting">Part A: Election And State Transiting</h2>
 <p>There are three different states in Raft: <code>leader</code>, <code>follower</code> and <code>candidate</code>. In a working Raft network, it is only allowed to have one <code>leader</code> to take the request and try to back up the request to the other nodes. And all other nodes become <code>follower</code> to receive log back up from leader and maintain a timer to start a leader election if not listening back from the leader after a certain time by converting itself to be an <code>candidate</code>.  And Raft uses an monophonically increasing integer as <code>term</code> number to tell different leaders.</p>
-<p><img class="img-zoomable" src="/imgs/raft/raft-state.png" alt="raft-state.png" />
+<p><img class="img-zoomable" src="imgs/raft/raft-state.png" alt="raft-state.png" />
 </p>
 <p>Following the state chart above and <code>RequestVoteRPC</code>, we can see what we need to implement:</p>
 <p>​	1) Initially, Set all the <code>Raft</code> struct to be <code>follower</code>. Each of them start a timer <code>electionTimeOut</code> of random duration. After timer time out, <code>follower</code> turns itself to be <code>candidate</code>, increase <code>term</code> by 1 and start a leader election;</p>
@@ -389,9 +379,6 @@ func (rf *Raft) broadcastHeartbeat(term int) {
         </div>
     </div>
     
-    
-    
-    
 </aside>
         </div>
         <div class="btn">
@@ -483,7 +470,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
             <span>&copy; 2020-2021
                 <a href="https://lianglouise.github.io/">Roy Liang</a>
                  | <a href="https://github.com/itsme/my_blog">Source code</a> 
-                | Powered by <a href="https://github.com/amzrk2/hugo-theme-fuji/"
+                | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
                    target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
                                                     target="_blank">Hugo</a> 
             </span>
@@ -492,9 +479,10 @@ func (rf *Raft) broadcastHeartbeat(term int) {
 </footer>
 
     
-<script defer src="https://cdn.jsdelivr.net/combine/npm/medium-zoom@1.0.6,npm/lazysizes@5.2.2"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/components/prism-core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.21.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
 
 

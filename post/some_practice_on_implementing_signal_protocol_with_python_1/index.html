@@ -141,7 +141,7 @@
 <h2 id="x3dh-protocol">X3DH Protocol</h2>
 <p>How shared DH Value computed in X3DH is using <a href="https://en.wikipedia.org/wiki/Curve25519" target="_blank">X25519 Key exchange</a> which is a <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman" target="_blank">Elliptic-curve Diffie–Hellman</a>. And I chose library <a href="https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/" target="_blank">cryptography</a>, which is part of <code>pyOpenSSL</code>, to compute this X25519 Key exchange.</p>
 <p>The basic workflow of establishing a session using X3DH is illustrated as below:</p>
-<p><img class="img-zoomable" src="imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH.png" alt="X3DH.png" />
+<p><img class="img-zoomable" src="/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH.png" alt="X3DH.png" />
 </p>
 <h3 id="preparation">Preparation</h3>
 <p>At first, both clients need to generate required key pairs, publish key bundles to server and save the secrets so they are able to start the session.</p>
@@ -164,30 +164,30 @@ from XEdDSA import sign
 class User():
 
   def __init__(self, name, MAX_OPK_NUM):
-    self.name = name
-    self.IK_s = x25519.X25519PrivateKey.generate()
-    self.IK_p = self.IK_s.public_key()
-    self.SPK_s = x25519.X25519PrivateKey.generate()
-    self.SPK_p = self.IK_s.public_key()
-    self.SPK_sig = sign(IK_s, SPK_p)
-    self.OKPs = []
-    self.OPKs_p = []
-    for i in range(MAX_OPK_NUM):
-      sk = x25519.X25519PrivateKey.generate()
-      pk = sk.public_key()
-      self.OPKs_p.append(pk)
-      self.OKPs.append((sk, pk))
-    # for later steps
-    self.key_bundles = {}
-    self.dr_keys= {}
+      self.name = name
+      self.IK_s = x25519.X25519PrivateKey.generate()
+      self.IK_p = self.IK_s.public_key()
+      self.SPK_s = x25519.X25519PrivateKey.generate()
+      self.SPK_p = self.IK_s.public_key()
+      self.SPK_sig = sign(IK_s, SPK_p)
+      self.OKPs = []
+      self.OPKs_p = []
+      for i in range(MAX_OPK_NUM):
+          sk = x25519.X25519PrivateKey.generate()
+          pk = sk.public_key()
+          self.OPKs_p.append(pk)
+          self.OKPs.append((sk, pk))
+          # for later steps
+          self.key_bundles = {}
+          self.dr_keys= {}
 
-  def publish(self):
-    return {
-      'IK_p': self.IK_p,
-      'SPK_p': self.SPK_p,
-      'SPK_sig': self.SPK_sig,
-      'OPKs_p': self.OPKs_p
-    }
+          def publish(self):
+              return {
+                  'IK_p': self.IK_p,
+                  'SPK_p': self.SPK_p,
+                  'SPK_sig': self.SPK_sig,
+                  'OPKs_p': self.OPKs_p
+              }
 </code></pre>
 <p>Due to unable to find out how to do <a href="https://signal.org/docs/specifications/xeddsa/" target="_blank">XEdDSA</a> signature required by signal protocol while using <code>cryptography</code>, since each library has their different way to format their X25519 Keys, here I picked a mock function <code>sign</code>. You could refer to this <a href="https://blog.filippo.io/using-ed25519-keys-for-encryption/" target="_blank">blog post</a> and <a href="https://tools.ietf.org/html/rfc8032#section-5.1.5" target="_blank">RFC Standard</a> to convert between Ed25519 and X25519</p>
 <h3 id="establish-the-session">Establish the Session</h3>
@@ -199,19 +199,19 @@ class User():
 
   # Get key bundle from a server object
   def get_key_bundle(self, server, user_name):
-    if user_name in self.key_bundles and user_name in self.dr_keys:
-      print('Already stored ' + user_name + ' locally, no need handshake again')
-      return False
+      if user_name in self.key_bundles and user_name in self.dr_keys:
+          print('Already stored ' + user_name + ' locally, no need handshake again')
+          return False
 
-    self.key_bundles[user_name] = server.get_key_bundle(user_name)
-    return True
+      self.key_bundles[user_name] = server.get_key_bundle(user_name)
+      return True
 
   def initial_handshake(self, server, user_name):
-    if get_key_bundle(user_name)
-      # Generate Ephemeral Key
-      sk = x25519.X25519PrivateKey.generate()
-      self.key_bundles[user_name]['EK_s'] = sk
-      self.key_bundles[user_name]['EK_p'] = sk.public_key()
+      if get_key_bundle(user_name):
+          # Generate Ephemeral Key
+          sk = x25519.X25519PrivateKey.generate()
+          self.key_bundles[user_name]['EK_s'] = sk
+          self.key_bundles[user_name]['EK_p'] = sk.public_key()
       return
 </code></pre>
 <ul>
@@ -234,7 +234,7 @@ class User():
 <p><code>OPK_pb</code> Bob&rsquo;s public One-time Off key</p>
 </li>
 </ul>
-<p><img class="img-zoomable" src="imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH_Key_exchange.png" alt="X3DH_Key_exchange.png" />
+<p><img class="img-zoomable" src="/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH_Key_exchange.png" alt="X3DH_Key_exchange.png" />
 </p>
 <p>getting 4 <code>DH</code> values and derivate a 32 bytes <code>SK</code>, where <code>SK = HKDF(DH_1||DH_2||DH_3||DH_4)</code></p>
 <pre><code class="language-python">from Crypto.Protocol.KDF import HKDF
@@ -244,7 +244,7 @@ from XEdDSA import verify
 KDF_F = b'\xff' * 32
 KDF_LEN = 32
 KDF_SALT = b'\0' * KDF_LEN
-  
+    
 # Continue in Class Client
   def x3dh_KDF(key_material):
     km = KDF_F + key_material

@@ -126,7 +126,7 @@
 <li><code>Get(key)</code>: Return the value if <code>key</code> exists in the map. Otherwise, return an empty string.</li>
 </ol>
 <p>If it&rsquo;s a singe server app, it won&rsquo;t take much time to implement. However, for fault tolerance, we will have to maintain multiple kv servers so that the service is available. Thus the real problem now is how to coordinate and synchronize the data between the servers through Raft.</p>
-<p><img class="img-zoomable" src="imgs/kvraft/kvraft.png" alt="kvraft" />
+<p><img class="img-zoomable" src="/imgs/kvraft/kvraft.png" alt="kvraft" />
 </p>
 <p>As diagram illustrated above, we will have a server cluster, where raft service can see each other to do the election and log replications but the kv server can only communicate with its only Raft service in the cluster. Clients will randomly send requests to any kv servers. However, only the kv server whose raft is the leader will proceed the request and send back the data. All other kv servers will reject the request and ask the client to try other kv server.</p>
 <h2 id="client">Client</h2>

@@ -122,11 +122,11 @@
 <p>In GFS or MapReduce, we have one single <code>Master</code> to manage the entire system. However, there is still a chance that the <code>Master</code> encounters some error or other issues. We than need a cluster to avoid this single point failure. And again, as in the distributed system, it&rsquo;s inevitable to have some nodes failed. We need a way to keep the requests and results  contestant across the cluster as recovery and always have one leader to take the requests from the users.</p>
 <p>Raft is a consensus algorithm for managing a replicated log. Here <em>log</em> refers to requests to be backed up in the cluster. Each node maintains a list of log of the same order. As long as <em>morn than half</em> of the nodes are alive in the network, the cluster can still be functional.</p>
 <p>The system we are to build follows the rules illustrated as this chart in the paper:</p>
-<p><img class="img-zoomable" src="imgs/raft/raft-chart.png" alt="raft-chart.png" />
+<p><img class="img-zoomable" src="/imgs/raft/raft-chart.png" alt="raft-chart.png" />
 </p>
 <h2 id="part-a-election-and-state-transiting">Part A: Election And State Transiting</h2>
 <p>There are three different states in Raft: <code>leader</code>, <code>follower</code> and <code>candidate</code>. In a working Raft network, it is only allowed to have one <code>leader</code> to take the request and try to back up the request to the other nodes. And all other nodes become <code>follower</code> to receive log back up from leader and maintain a timer to start a leader election if not listening back from the leader after a certain time by converting itself to be an <code>candidate</code>.  And Raft uses an monophonically increasing integer as <code>term</code> number to tell different leaders.</p>
-<p><img class="img-zoomable" src="imgs/raft/raft-state.png" alt="raft-state.png" />
+<p><img class="img-zoomable" src="/imgs/raft/raft-state.png" alt="raft-state.png" />
 </p>
 <p>Following the state chart above and <code>RequestVoteRPC</code>, we can see what we need to implement:</p>
 <p>​	1) Initially, Set all the <code>Raft</code> struct to be <code>follower</code>. Each of them start a timer <code>electionTimeOut</code> of random duration. After timer time out, <code>follower</code> turns itself to be <code>candidate</code>, increase <code>term</code> by 1 and start a leader election;</p>

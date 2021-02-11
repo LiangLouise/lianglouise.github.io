@@ -112,7 +112,7 @@
         <a href="https://lianglouise.github.io/post/6.824_lab3a/">KV Raft - 6.824 Lab3C</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1289 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1285 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
@@ -153,7 +153,7 @@ type GetArgs struct {
 	Key      string
 }
 
-type GetArgs struct {
+type GetReply struct {
 	Key   string
 	Value string
     Err   string
@@ -168,13 +168,8 @@ func (ck *Clerk) Get(key string) string {
 		Key:      key,
 	}
     
-    for {
-        // Send RPC
-        ok := ck.servers[leaderId].Call(&quot;KVServer.Get&quot;, &amp;args, &amp;reply)
-       	// If timeout, retry
-        
-        // either return or retry based on reply.Err
-    }
+    // Send Get Rpc and wait for the response
+    // If timeout or error wrong leader, try anoterh server
 }
 </code></pre>
 <h2 id="server-side">Server Side</h2>

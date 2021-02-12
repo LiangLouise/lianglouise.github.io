@@ -112,7 +112,7 @@
         <a href="https://lianglouise.github.io/post/6.824_lab3a/">KV Raft - 6.824 Lab3C</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1285 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1284 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
 
     </div>
     
@@ -275,12 +275,12 @@ func (kv *KVServer) waitApplyChan() {
 }
 </code></pre>
 <h3 id="changes-in-raft">Changes in Raft</h3>
-<p>A very important thing to remember is that in this Lab3A is that <code>KVServer</code> will lose all the data once it dies. The way to recover to the previous state are two:</p>
+<p>A very important thing to remember in this Lab3A is that <code>KVServer</code> will lose all the data once it dies. The way to recover to the previous state are two:</p>
 <ul>
 <li>Raft replays all the committed logs it has from 0 to <code>rf.commitIndex</code>;</li>
-<li>Use RPC <code>InstallSnapshot</code> which we are to implement in the next lab.</li>
+<li>Use RPC <code>InstallSnapshot</code>, which we are to implement in the next lab.</li>
 </ul>
-<p>Thus my solution for recovering the data of <code>kv</code> is that <code>rf.lastApplied</code> will be reset to 0 once rebooting, which indicates that <code>kv</code> has no data at all. So once Raft needs to send new <code>ApplyMsg</code> to <code>kv</code>, we should send <code>rf.log[rf.lastApplied+1:newCommitIndex+1]</code> and mark all the logs whose index 
+<p>Thus the easiest solution for recovering the data of <code>kv</code> is that <code>rf.lastApplied</code> will be reset to 0 once rebooting, which indicates that <code>kv</code> has no data at all. So once Raft needs to send new <code>ApplyMsg</code> to <code>kv</code>, we should send <code>rf.log[rf.lastApplied+1:newCommitIndex+1]</code> and mark all the logs whose index 
 \(\leq\)
  <code>oldCommitIndex</code> invalid data as tester has seen these logs already.</p>
     </div>

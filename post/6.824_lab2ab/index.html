@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.80.0" />
+<meta name="generator" content="Hugo 0.81.0" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -29,7 +29,7 @@
 <meta name="author" content="Roy Liang" />
 
 
-<meta name="description" content="A minimal Hugo theme with nice theme color." />
+<meta name="description" content="The Blog of Roy Liang" />
 
 
 <meta name="keywords" content="Distributed System" />
@@ -248,13 +248,13 @@ type Raft struct {
 <p>For node state transiting, a good idea is to use set methods to group all the variables you need to update for state change so you won&rsquo;t miss some of them.</p>
 <p>Use changing to Follower as an example:</p>
 <pre><code class="language-go">func (rf *Raft) setStateFollower(term, voteFor int) {
- rf.currTerm = term
- rf.votedFor = voteFor
- // Update last time hear from the leader
- rf.state = Follower
- rf.lastUpdate = time.Now()
+	rf.currTerm = term
+	rf.votedFor = voteFor
+	// Update last time hear from the leader
+	rf.state = Follower
+	rf.lastUpdate = time.Now()
  // Start a new election timer
- go rf.electionTimeOut(term)
+	go rf.electionTimeOut(term)
 }
 </code></pre>
 </li>
@@ -265,11 +265,11 @@ type Raft struct {
 <p>Election and heartbeat timers are suggested to implement using <code>for {}</code> instead of <code>time.NewTimer</code>. I also pass in a <code>term</code> to the timer so that when using set methods to update node&rsquo;s state, you don&rsquo;t have to warry about if you need to restart a new timer or not.</p>
 <p>Use heartbeat as an example:</p>
 <pre><code class="language-go">const (
- HeartbeatInterval = 120 * time.Millisecond
+	HeartbeatInterval = 120 * time.Millisecond
 )
    
 func (rf *Raft) broadcastHeartbeat(term int) {
- for !rf.killed() {
+	for !rf.killed() {
      rf.mu.Lock()
      // Stop sent heartbeats if not a leader or has jumped to another term
      if rf.state != Leader || rf.currTerm &gt; term {
@@ -289,7 +289,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
      }
      rf.mu.Unlock()
      time.Sleep(HeartbeatInterval)
- }
+	}
 }
 </code></pre>
 </li>

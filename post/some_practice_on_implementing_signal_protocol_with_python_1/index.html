@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.82.0" />
+<meta name="generator" content="Hugo 0.83.1" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -244,7 +244,7 @@ from XEdDSA import verify
 KDF_F = b'\xff' * 32
 KDF_LEN = 32
 KDF_SALT = b'\0' * KDF_LEN
-    
+
 # Continue in Class Client
   def x3dh_KDF(key_material):
     km = KDF_F + key_material
@@ -394,7 +394,7 @@ AES_TAG_LEN =16
 
     # For Double Ratchet
     self.initialize_dr_state(sender, sk, [], EK_pa)
-        
+
     # Get Ek_pa and plaintext ad
     return EK_pa, message
 

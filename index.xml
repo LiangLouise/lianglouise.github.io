@@ -8,6 +8,16 @@
     <language>en</language>
     <lastBuildDate>Wed, 10 Feb 2021 23:44:05 -0500</lastBuildDate><atom:link href="https://lianglouise.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Meeting With Me</title>
+      <link>https://lianglouise.github.io/meeting/</link>
+      <pubDate>Fri, 25 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://lianglouise.github.io/meeting/</guid>
+      <description>Please book your time below.
+  </description>
+    </item>
+    
+    <item>
       <title>KV Raft - 6.824 Lab3A</title>
       <link>https://lianglouise.github.io/post/6.824_lab3a/</link>
       <pubDate>Wed, 10 Feb 2021 23:44:05 -0500</pubDate>
@@ -100,16 +110,6 @@ The Key&amp;rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025
 Finally! At the end of 2019, I managed to launched my personal blog with the help of Hexo and archer theme. with the help of Hugo and Fuji theme.
 I will share my naive thoughts and experiences on coding here. 😜
 Hope you could find something helpful and interesting.</description>
-    </item>
-    
-    <item>
-      <title>Meeting With Me</title>
-      <link>https://lianglouise.github.io/meeting/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://lianglouise.github.io/meeting/</guid>
-      <description>Please Sign your time below.
-  </description>
     </item>
     
   </channel>

@@ -193,8 +193,8 @@ graph TB
 	rf_1 --> |a5. Send backed up load to its kv server | kv2
 	rf_2 --> |"as (a5)"| kv3
 	kv1  --> |"a6. Success (with data return)"| client
-	client --> | b1. New request| kv2
-	kv2 --> | b2. Falied due to not leader| client
+	client -. b1. New request .-> kv2
+	kv2 -. b2. Falied due to not leader .-> client
 </div>
 <blockquote>
 <p>In section <em>a</em>, the request is sent to leader and got proceeded in the all the nodes in the cluster but in section <em>b</em>, the request is rejected as <code>KV Follower 1</code> is not the leader in the cluster.</p>

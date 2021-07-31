@@ -13,9 +13,7 @@
       <pubDate>Fri, 30 Jul 2021 21:22:57 -0400</pubDate>
       
       <guid>https://lianglouise.github.io/post/list_in_pintos/</guid>
-      <description>Pintos is a simple Linux OS for the course CS140. It&amp;rsquo;s designed to help understand some important functions of OS, including threads, virtual memory and file system. Though it&amp;rsquo;s very simple compared to the real linux kernel, it still can run an real x86 simulator.
-This post is about an important data structure list in the src/lib/kernel/list.c, which is used massively in the pintos project. But its design usually made it easy to confuse the people at first, so it&amp;rsquo;s very interesting to look into its implementation.
-Some Background Since Standard C doesn&amp;rsquo;t provide dynamic list library, it&amp;rsquo;s up to developers to decide how to implement the list when they need to use it.</description>
+      <description>&lt;p&gt;This post is about an important data structure, embedded linked list, which is used massively in the pintos project amd offers a different idea how to create dynamic list in C. But its design usually made it easy to confuse the people at first, so it&amp;rsquo;s very interesting to look into its implementation.&lt;/p&gt;</description>
     </item>
     
   </channel>

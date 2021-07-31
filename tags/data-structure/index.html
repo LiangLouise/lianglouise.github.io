@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#ffffff">
 
 
-<title>Email and GPG Keys - Roy&#39;s Repo</title>
+<title>data structure - Roy&#39;s Repo</title>
 
 
 <meta name="author" content="Roy Liang" />
@@ -33,13 +33,10 @@
 
 
 
-<meta property="og:title" content="Email and GPG Keys" />
-<meta name="twitter:title" content="Email and GPG Keys" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/gpg_email/" /><meta property="og:description" content="You can reach out to me through my university email jiasong.liang@mail.utoronto.ca (with the email&rsquo;s GPG Key).
-The Key&rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025 9927." />
-<meta name="twitter:description" content="You can reach out to me through my university email jiasong.liang@mail.utoronto.ca (with the email&rsquo;s GPG Key).
-The Key&rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025 9927." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2020-10-20T19:15:32+08:00" /><meta property="article:modified_time" content="2020-10-20T19:15:32+08:00" />
+<meta property="og:title" content="data structure" />
+<meta name="twitter:title" content="data structure" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://lianglouise.github.io/tags/data-structure/" /><meta name="twitter:card" content="summary" /><meta property="og:updated_time" content="2021-07-30T21:22:57-04:00" />
 
 
 <style>
@@ -106,22 +103,33 @@ The Key&rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025 992
             
             <div class="col-12 col-md-9 float-left content">
                 
-<article>
-    
+
+<div class="page-info">
+    <span>Posts with the tag data structure: </span>
+</div>
+
+
+
+<div class="post">
     <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/gpg_email/">Email and GPG Keys</a>
+        <a href="https://lianglouise.github.io/post/list_in_pintos/">List in Pintos</a>
     </h2>
     <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-10-20</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;31 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;No tag</span>
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-07-30</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1142 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/linux-kernel">linux kernel</a>&nbsp;<a href="/tags/data-structure">data structure</a>&nbsp;</span>
 
     </div>
-    
-    <div class="post-content markdown-body">
-        <p>You can reach out to me through my university email <a href="mailto:jiasong.liang@mail.utoronto.ca">jiasong.liang@mail.utoronto.ca</a> (with the email&rsquo;s <a href="https://keys.openpgp.org/search?q=36904D4EE0259927" target="_blank">GPG Key</a>).</p>
-<p>The Key&rsquo;s finger print is <code>4EE3 1C4E EDC3 F95B E281  E12A 3690 4D4E E025 9927</code>.</p>
-
+    <div class="post-item post-summary markdown-body">
+        Pintos is a simple Linux OS for the course CS140. It&rsquo;s designed to help understand some important functions of OS, including threads, virtual memory and file system. Though it&rsquo;s very simple compared to the real linux kernel, it still can run an real x86 simulator.
+This post is about an important data structure list in the src/lib/kernel/list.c, which is used massively in the pintos project. But its design usually made it easy to confuse the people at first, so it&rsquo;s very interesting to look into its implementation.
+Some Background Since Standard C doesn&rsquo;t provide dynamic list library, it&rsquo;s up to developers to decide how to implement the list when they need to use it.
     </div>
-</article>
+</div>
+
+
+
+
+
+
 
 
 
@@ -197,6 +205,8 @@ The Key&rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025 992
             
         </div>
     </div>
+    
+    
     
 </aside>
         </div>

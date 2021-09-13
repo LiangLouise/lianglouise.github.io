@@ -8,6 +8,23 @@
     <language>en</language>
     <lastBuildDate>Fri, 30 Jul 2021 21:22:57 -0400</lastBuildDate><atom:link href="https://lianglouise.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>About Me</title>
+      <link>https://lianglouise.github.io/about/</link>
+      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://lianglouise.github.io/about/</guid>
+      <description>I am a HBsc. in Co-op Computer Science Program, Software Engineering Stream at University of Toronto Scarborough.
+Currently, I am focusing on learning full stack development and Machine Learning.
+You may also get a pdf version Resume here.
+Education  September 2017 - December 2021 (Expected)  Candidate, Honors Bachelor of Science
+University of Toronto Scarborough
+ Computer Science Specialist Co-op Program, Software Development Stream, 4th Year;
+    Professional  May 2021 - Dec 2021  Teaching Assistant; University of Toronto Scarborough
+Teaching Assistant of Course CSCD27: Computer and Network Security;
+Hosted Weekly tutorials and practical sessions and assisted on course project improvement.</description>
+    </item>
+    
+    <item>
       <title>List in Pintos</title>
       <link>https://lianglouise.github.io/post/list_in_pintos/</link>
       <pubDate>Fri, 30 Jul 2021 21:22:57 -0400</pubDate>
@@ -80,23 +97,6 @@
       
       <guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</guid>
       <description>&lt;p&gt;Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - &lt;a href=&#34;https://signal.org/docs/&#34; target=&#34;_blank&#34;&gt;Signal Protocol&lt;/a&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>About Me</title>
-      <link>https://lianglouise.github.io/about/</link>
-      <pubDate>Tue, 20 Oct 2020 19:15:32 +0800</pubDate>
-      
-      <guid>https://lianglouise.github.io/about/</guid>
-      <description>I am a HBsc. in Co-op Computer Science Program, Software Engineering Stream at University of Toronto Scarborough.
-Currently, I am focusing on learning full stack development and Machine Learning.
-You may also get a pdf version Resume here.
-Education  September 2017 - December 2021 (Expected)  Candidate, Honors Bachelor of Science
-University of Toronto Scarborough
- Computer Science Specialist Co-op Program, Software Development Stream, 4th Year;
-    Professional  May 2021 - Dec 2021  Teaching Assistant; University of Toronto Scarborough
-Teaching Assistant of Course CSCD27: Computer and Network Security;
-Hosted Weekly tutorials and practical sessions and assisted on course project improvement.</description>
     </item>
     
     <item>

@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://lianglouise.github.io/about/</loc>
+    <lastmod>2021-09-12T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://lianglouise.github.io/tags/data-structure/</loc>
     <lastmod>2021-07-30T21:22:57-04:00</lastmod>
   </url><url>
@@ -46,9 +49,6 @@
   </url><url>
     <loc>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</loc>
     <lastmod>2020-10-20T18:27:11-04:00</lastmod>
-  </url><url>
-    <loc>https://lianglouise.github.io/about/</loc>
-    <lastmod>2020-10-20T19:15:32+08:00</lastmod>
   </url><url>
     <loc>https://lianglouise.github.io/gpg_email/</loc>
     <lastmod>2020-10-20T19:15:32+08:00</lastmod>

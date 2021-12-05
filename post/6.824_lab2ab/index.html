@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.88.1" />
+<meta name="generator" content="Hugo 0.89.4" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -270,25 +270,25 @@ type Raft struct {
 
 func (rf *Raft) broadcastHeartbeat(term int) {
 	for !rf.killed() {
-     rf.mu.Lock()
-     // Stop sent heartbeats if not a leader or has jumped to another term
-     if rf.state != Leader || rf.currTerm &gt; term {
-         rf.mu.Unlock()
-         break
-     }
+		rf.mu.Lock()
+		// Stop sent heartbeats if not a leader or has jumped to another term
+		if rf.state != Leader || rf.currTerm &gt; term {
+			rf.mu.Unlock()
+			break
+		}
 
      // Some other operations in between...
 
-     // Send heartbeat to all other peers
-     for i, _ := range rf.peers {
-         if i == rf.me {
-             continue
-         }
+		// Send heartbeat to all other peers
+		for i, _ := range rf.peers {
+			if i == rf.me {
+				continue
+			}
             // You can construct AppendEntriesArgs here or in the function
-         go rf.sendAppendEntries(i)
-     }
-     rf.mu.Unlock()
-     time.Sleep(HeartbeatInterval)
+			go rf.sendAppendEntries(i)
+		}
+		rf.mu.Unlock()
+		time.Sleep(HeartbeatInterval)
 	}
 }
 </code></pre>

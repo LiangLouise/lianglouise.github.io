@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.88.1" />
+<meta name="generator" content="Hugo 0.89.4" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -200,18 +200,18 @@ class User():
   # Get key bundle from a server object
   def get_key_bundle(self, server, user_name):
       if user_name in self.key_bundles and user_name in self.dr_keys:
-          print('Already stored ' + user_name + ' locally, no need handshake again')
-          return False
+      	print('Already stored ' + user_name + ' locally, no need handshake again')
+      	return False
 
-      self.key_bundles[user_name] = server.get_key_bundle(user_name)
-      return True
+    	self.key_bundles[user_name] = server.get_key_bundle(user_name)
+    	return True
 
   def initial_handshake(self, server, user_name):
-      if get_key_bundle(user_name):
-          # Generate Ephemeral Key
-          sk = x25519.X25519PrivateKey.generate()
-          self.key_bundles[user_name]['EK_s'] = sk
-          self.key_bundles[user_name]['EK_p'] = sk.public_key()
+    	if get_key_bundle(user_name):
+      	# Generate Ephemeral Key
+      	sk = x25519.X25519PrivateKey.generate()
+      	self.key_bundles[user_name]['EK_s'] = sk
+      	self.key_bundles[user_name]['EK_p'] = sk.public_key()
       return
 </code></pre>
 <ul>

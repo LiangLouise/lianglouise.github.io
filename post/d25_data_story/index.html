@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.90.0" />
+<meta name="generator" content="Hugo 0.94.2" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -714,7 +714,7 @@ fig_1.show()
     allowfullscreen
 ></iframe>
 <ul>
-<li>mean of total comments' score under the same submission</li>
+<li>mean of total comments&rsquo; score under the same submission</li>
 </ul>
 <pre><code class="language-python">sta_19.fillna(0, inplace=True)
 mean_com_count = sta_19.groupby('anime').agg({'com_count': 'mean', 'season': 'min'})
@@ -745,7 +745,7 @@ fig_2.show()
     allowfullscreen
 ></iframe>
 <ul>
-<li>median of total comments' score under the same submission</li>
+<li>median of total comments&rsquo; score under the same submission</li>
 </ul>
 <pre><code class="language-python">med_com_score = sta_19.groupby('anime').agg({'com_median': 'mean', 'season': 'min'})
 top5_by_com_score_med = med_com_score.groupby('season').apply(lambda x: x.sort_values(by='com_median', ascending=False, na_position='first').reset_index().head(5)).droplevel(0)
@@ -817,7 +817,7 @@ sta_19.plot.scatter(x='comment_total', y='score', logy=True, logx=True)
 </p>
 <p><img class="img-zoomable" src="/imgs/d25_report_imgs/output_20_2.png" alt="png" />
 </p>
-<p>Apparently, both the mean of and the sum of the comments' score are highly relevant to submission&rsquo;s score, thus we only need to rely on the score of the submission to rank the animes. Then we can rank the anime in each season from 2019 to 2021 using the mean score of the discussion submission post.</p>
+<p>Apparently, both the mean of and the sum of the comments&rsquo; score are highly relevant to submission&rsquo;s score, thus we only need to rely on the score of the submission to rank the animes. Then we can rank the anime in each season from 2019 to 2021 using the mean score of the discussion submission post.</p>
 <p>Now we can rank the top 5 animes in each season of each year as below</p>
 <ul>
 <li>2019</li>
@@ -1802,7 +1802,7 @@ vali_mses.plot.line(grid=True, marker='^', legend=True)
     <div class="container-lg clearfix">
         <div class="col-12 footer">
             
-            <span>&copy; 2019-2021
+            <span>&copy; 2019-2022
                 <a href="https://lianglouise.github.io/">Roy Liang</a>
                  | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
                 | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"

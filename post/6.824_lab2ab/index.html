@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.90.0" />
+<meta name="generator" content="Hugo 0.94.2" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -187,7 +187,7 @@ type Raft struct {
 <p>In this part, <code>Raft</code> struct will receive logs from the test by <code>rf.Start()</code> to reach agreement among the peers and the log replication is one of the most important part of Raft.</p>
 <p>The logic is quite straightforward:</p>
 <p>​	1) <code>leader</code> receive a new command from the user through <code>rf.Start()</code> and appends this new log to the end of the <code>rf.log[]</code>;</p>
-<p>​	2) <code>leader</code> can call peers' <code>AppendEntryRPC</code> immediately after receiving one new log but also wait until leader calls <code>broadcastHeartbeat</code> to send all the new logs together, which is a good way to avoid calling <code>AppendEntryRPC</code> too frequently and have concurrent update issues with  <code>rf.nextIndex[]</code> and <code>rf.matchIndex</code>;</p>
+<p>​	2) <code>leader</code> can call peers&rsquo; <code>AppendEntryRPC</code> immediately after receiving one new log but also wait until leader calls <code>broadcastHeartbeat</code> to send all the new logs together, which is a good way to avoid calling <code>AppendEntryRPC</code> too frequently and have concurrent update issues with  <code>rf.nextIndex[]</code> and <code>rf.matchIndex</code>;</p>
 <p>​	3) <code>follower</code> receives a <code>AppendEntryRPCArgs</code>, comparing <code>rf.log[args.PreLogIndex].Term</code> with <code>args.PreLogTerm</code>. If equaling, <code>follower</code> can reach a agreement up to <code>args.PreLogIndex</code> then append the new entries in the request:</p>
 <p>​			<code>append(rf.log[:args.PreLogIndex+1], args.Entries...)</code></p>
 <p>​	Otherwise, <code>follower</code> replies with <code>false</code>, asking <code>leader</code> to decrease the <code>args.PreLogIndex</code> recursively until finding some index where <code>leader</code> and <code>follower</code> can reach an agreement. <code>follower</code> should abort the logs between <code>args.PreLogIndex</code> and <code>rf.lastApplied</code>;</p>
@@ -300,7 +300,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
 <h2 id="references">References</h2>
 <ol>
 <li><a href="http://thesecretlivesofdata.com/raft/" target="_blank">Raft Visualization</a></li>
-<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students' Guide to Raft</a></li>
+<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students&rsquo; Guide to Raft</a></li>
 </ol>
     </div>
 </article>
@@ -515,7 +515,7 @@ func (rf *Raft) broadcastHeartbeat(term int) {
     <div class="container-lg clearfix">
         <div class="col-12 footer">
             
-            <span>&copy; 2019-2021
+            <span>&copy; 2019-2022
                 <a href="https://lianglouise.github.io/">Roy Liang</a>
                  | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
                 | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"

@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.90.0" />
+<meta name="generator" content="Hugo 0.94.2" />
 
 
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
@@ -182,7 +182,7 @@ func (rf *Raft) readPersist(data []byte) {
 <h2 id="optimization">Optimization</h2>
 <p>Some tests still get failed sometimes, below are the optimization on top of implementation following figure <em>2</em> to omit the failures.</p>
 <h3 id="log-disagreement">Log disagreement</h3>
-<p>Sometimes the test would fail because taking too long to reach an agreement. You can follow the instructions in the <a href="https://thesquareplanet.com/blog/students-guide-to-raft/#an-aside-on-optimizations" target="_blank">An aside on optimizations</a> in the post <em>Students' Guide to Raft</em> mentioned in the handout. Add two extra variables in <code>AppendEntriesRPC</code> reply: <code>ConflictTerm</code> and <code>ConflictIndex</code> to speed up decrement in stead of decreasing one term per round.</p>
+<p>Sometimes the test would fail because taking too long to reach an agreement. You can follow the instructions in the <a href="https://thesquareplanet.com/blog/students-guide-to-raft/#an-aside-on-optimizations" target="_blank">An aside on optimizations</a> in the post <em>Students&rsquo; Guide to Raft</em> mentioned in the handout. Add two extra variables in <code>AppendEntriesRPC</code> reply: <code>ConflictTerm</code> and <code>ConflictIndex</code> to speed up decrement in stead of decreasing one term per round.</p>
 <p>So at <code>leader</code> side we have:</p>
 <pre><code class="language-go">// Check if the leader has a log at the ConflitTerm
 // and get the last entry in the term
@@ -276,7 +276,7 @@ rf.nextIndex[i] = args.PrevLogIndex + len(args.Entries) + 1
 </code></pre>
 <h2 id="references">References</h2>
 <ol>
-<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students' Guide to Raft</a></li>
+<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students&rsquo; Guide to Raft</a></li>
 </ol>
     </div>
 </article>
@@ -491,7 +491,7 @@ rf.nextIndex[i] = args.PrevLogIndex + len(args.Entries) + 1
     <div class="container-lg clearfix">
         <div class="col-12 footer">
             
-            <span>&copy; 2019-2021
+            <span>&copy; 2019-2022
                 <a href="https://lianglouise.github.io/">Roy Liang</a>
                  | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
                 | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"

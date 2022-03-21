@@ -6,7 +6,16 @@
     <description>Recent content in data structure on Roy&#39;s Repo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 30 Jul 2021 21:22:57 -0400</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/data-structure/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://lianglouise.github.io/tags/data-structure/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hash Table in Pintos</title>
+      <link>https://lianglouise.github.io/post/hash_table_in_pintos/</link>
+      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://lianglouise.github.io/post/hash_table_in_pintos/</guid>
+      <description>&lt;p&gt;Apart from the &lt;a href=&#34;https://lianglouise.github.io/post/6.list_in_pintos/&#34;&gt;linked list&lt;/a&gt;, there is another handful structure offered by Pintos kernel library - &lt;em&gt;Hash Table&lt;/em&gt;.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>List in Pintos</title>
       <link>https://lianglouise.github.io/post/list_in_pintos/</link>

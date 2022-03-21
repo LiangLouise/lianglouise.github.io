@@ -23,7 +23,7 @@
 <meta name="theme-color" content="#ffffff">
 
 
-<title>linux kernel - Roy&#39;s Repo</title>
+<title>Hash Table in Pintos - Roy&#39;s Repo</title>
 
 
 <meta name="author" content="Roy Liang" />
@@ -32,11 +32,14 @@
 <meta name="description" content="The Blog of Roy Liang" />
 
 
+<meta name="keywords" content="linux kernel, data structure" />
 
-<meta property="og:title" content="linux kernel" />
-<meta name="twitter:title" content="linux kernel" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://lianglouise.github.io/tags/linux-kernel/" /><meta name="twitter:card" content="summary" /><meta property="og:updated_time" content="2022-03-21T00:00:00+00:00" />
+
+<meta property="og:title" content="Hash Table in Pintos" />
+<meta name="twitter:title" content="Hash Table in Pintos" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://lianglouise.github.io/post/hash_table_in_pintos/" /><meta property="og:description" content="Apart from the linked list, there is another handful structure offered by Pintos kernel library - Hash Table." />
+<meta name="twitter:description" content="Apart from the linked list, there is another handful structure offered by Pintos kernel library - Hash Table." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2022-03-21T00:00:00+00:00" /><meta property="article:modified_time" content="2022-03-21T00:00:00+00:00" />
 
 
 <style>
@@ -103,14 +106,8 @@
             
             <div class="col-12 col-md-9 float-left content">
                 
-
-<div class="page-info">
-    <span>Posts with the tag linux kernel: </span>
-</div>
-
-
-
-<div class="post">
+<article>
+    
     <h2 class="post-item post-title">
         <a href="https://lianglouise.github.io/post/hash_table_in_pintos/">Hash Table in Pintos</a>
     </h2>
@@ -118,30 +115,117 @@
         <span><i class="iconfont icon-today-sharp"></i>&nbsp;2022-03-21</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;781 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/linux-kernel">linux kernel</a>&nbsp;<a href="/tags/data-structure">data structure</a>&nbsp;</span>
 
     </div>
-    <div class="post-item post-summary markdown-body">
+    
+    <div class="post-content markdown-body">
         <p>Apart from the <a href="/post/6.list_in_pintos/">linked list</a>, there is another handful structure offered by Pintos kernel library - <em>Hash Table</em>.</p>
+<p>The hash table in Pintos is not much different from any ordinary hash table. The technique it uses to solve hash collision is chaining which is the most classic solution.</p>
+<p><img class="img-zoomable" src="https://commons.wikimedia.org/wiki/File:Hash_table_5_0_1_1_1_1_1_LL.svg#/media/File:Hash_table_5_0_1_1_1_1_1_LL.svg" alt="chaining" />
+</p>
+<pre><code class="language-C">struct hash_elem *
+hash_insert (struct hash *h, struct hash_elem *new)
+{
+  struct list *bucket = find_bucket (h, new);
+  struct hash_elem *old = find_elem (h, bucket, new);
+
+  if (old == NULL) 
+    insert_elem (h, bucket, new);
+
+  rehash (h);
+
+  return old; 
+}
+
+/* Inserts E into BUCKET (in hash table H). */
+static void
+insert_elem (struct hash *h, struct list *bucket, struct hash_elem *e) 
+{
+  h-&gt;elem_cnt++;
+  /* New element will put at the front the list */
+  list_push_front (bucket, &amp;e-&gt;list_elem);
+}
+</code></pre>
+<blockquote>
+<p>This is the <a href="https://github.com/LiangLouise/pintos_dev_container/blob/2e052eacf8093ed2adb147a3b2b4ead5fd3d64dc/src/lib/kernel/hash.c#L99" target="_blank">code</a> used to insert a new element into the table. Note that the bucket is implemented in Linked List, so it can grow or shrink easily.</p>
+</blockquote>
+<h2 id="create-a-hash-table">Create A Hash Table</h2>
+<p>To create a table, we need first declare a <code>struct hash</code> variable which will contains following:</p>
+<pre><code class="language-c">/* Hash table. */
+struct hash 
+  {
+    size_t elem_cnt;            /* Number of elements in table. */
+    size_t bucket_cnt;          /* Number of buckets, a power of 2. */
+    struct list *buckets;       /* Array of `bucket_cnt' lists. */
+    hash_hash_func *hash;       /* Hash function. */
+    hash_less_func *less;       /* Comparison function. */
+    void *aux;                  /* Auxiliary data for `hash' and `less'. */
+  };
+</code></pre>
+<p>It is basically the same when you create a hash table in any other languages, requiring a hash function, comparing functions and it will store the pointers to each bucket.</p>
+<h3 id="put-an-element-into-table">Put An Element Into Table</h3>
+<p>And for the same reason described in the linked list post, to be able to put a struct into the table, developer has to add <code>struct hash_elem</code> as a member. Note that the <code>struct hash_elem</code> is just a wrap of <code>struct list_elem</code> since when doing inserting, our final operation is to put the element into the chaining linked list.</p>
+<pre><code class="language-c">struct page
+  {
+    struct hash_elem hash_elem; /* Hash table element. */
+    void *addr;                 /* Virtual address. */
+    /* ...other members... */
+  };
+</code></pre>
+<h3 id="hash-functions">Hash Functions</h3>
+<p>Since C itself has no support for hash table, so it&rsquo;s up developers to decide how to hash the data they want to put into the table. Luckily, Pintos&rsquo;s authors have provided hash functions for most commonly used data types:</p>
+<pre><code class="language-c">// hash.h
+
+/* Sample hash functions. */
+unsigned hash_bytes (const void *, size_t);
+unsigned hash_string (const char *);
+unsigned hash_int (int);
+</code></pre>
+<h3 id="comparing-functions">Comparing Functions</h3>
+<p>Since we are using chaining to store the elements in the same bucket. When doing any operations, after locating the bucket, we need to iterate through the linked list to see if there exists the same element in the bucket. Thus we need also define a comparing function ourselves to check if they elements are different or not.</p>
+<pre><code class="language-c">/* Returns true if page a precedes page b. */
+bool
+page_less (const struct hash_elem *a_, const struct hash_elem *b_,
+           void *aux UNUSED)
+{
+  const struct page *a = hash_entry (a_, struct page, hash_elem);
+  const struct page *b = hash_entry (b_, struct page, hash_elem);
+
+  return a-&gt;addr &lt; b-&gt;addr;
+}
+</code></pre>
+<blockquote>
+<p>Costumed compared function in the hash table, here <code>addr</code> is the key of page hash table, so when we compares two pages, we can compare them by their <code>addr</code> values.</p>
+</blockquote>
+<h2 id="rehashing">Rehashing</h2>
+<p>Since our bucket is implemented in Linked List, each time we do a look up would be $O(N)$ long, it will significantly decrease the look up speed if some hash collisions happening too frequently, i.e. some chaining becomes too long. We need to add more buckets from time to time so that more bytes would be used for hashing and we can have shorter chains (hopefully).</p>
+<p>In terms of how to grow the number of buckets, the policy in Pintos is quite simple:</p>
+<pre><code class="language-c">static void
+rehash (struct hash *h) {
+  // ...
+  /* Calculate the number of buckets to use now.
+     We want one bucket for about every BEST_ELEMS_PER_BUCKET.
+     We must have at least four buckets, and the number of
+     buckets must be a power of 2. */
+  new_bucket_cnt = h-&gt;elem_cnt / BEST_ELEMS_PER_BUCKET;
+  if (new_bucket_cnt &lt; 4)
+    new_bucket_cnt = 4;
+  while (!is_power_of_2 (new_bucket_cnt))
+    new_bucket_cnt = turn_off_least_1bit (new_bucket_cnt); 
+
+  // ... 
+}
+</code></pre>
+<p>Ideally, we hope the average number of elements in each bucket is 2 and no more than 4. So after inserting or deleting, the table will automatically recalculate the required bucket number and cast it down to the nearest power of two.</p>
+<p>After allocating the new memory space for the new buckets, it will read each element from the old buckets, rehash bytes based on the new bucket number and put the element into the corresponding new buckets.</p>
     </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a>.</p>
+    </blockquote>
 </div>
-
-<div class="post">
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/list_in_pintos/">List in Pintos</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-07-30</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1153 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/linux-kernel">linux kernel</a>&nbsp;<a href="/tags/data-structure">data structure</a>&nbsp;</span>
-
-    </div>
-    <div class="post-item post-summary markdown-body">
-        <p>This post is about an important data structure, embedded linked list, which is used massively in the pintos project amd offers a different idea how to create dynamic list in C. But its design usually made it easy to confuse the people at first, so it&rsquo;s very interesting to look into its implementation.</p>
-    </div>
-</div>
-
-
-
-
-
-
-
 
 
 
@@ -216,9 +300,19 @@
             
         </div>
     </div>
-    
-    
-    
+    <div class="sidebar-item sidebar-toc">
+        <h3>TOC</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#create-a-hash-table">Create A Hash Table</a>
+      <ul>
+        <li><a href="#put-an-element-into-table">Put An Element Into Table</a></li>
+        <li><a href="#hash-functions">Hash Functions</a></li>
+        <li><a href="#comparing-functions">Comparing Functions</a></li>
+      </ul>
+    </li>
+    <li><a href="#rehashing">Rehashing</a></li>
+  </ul>
+</nav></div>
 </aside>
         </div>
         <div class="btn">
@@ -302,6 +396,24 @@
             </span>
             
         </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>TOC</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#create-a-hash-table">Create A Hash Table</a>
+      <ul>
+        <li><a href="#put-an-element-into-table">Put An Element Into Table</a></li>
+        <li><a href="#hash-functions">Hash Functions</a></li>
+        <li><a href="#comparing-functions">Comparing Functions</a></li>
+      </ul>
+    </li>
+    <li><a href="#rehashing">Rehashing</a></li>
+  </ul>
+</nav>
     </div>
     
     

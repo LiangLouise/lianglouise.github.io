@@ -1,124 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html><html lang=en>
 <head>
-    
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="HandheldFriendly" content="True" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.96.0" />
-
-
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-<link rel="manifest" href="/favicon/site.webmanifest">
-<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="shortcut icon" href="/favicon/favicon.ico">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-config" content="/favicon/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">
-
-
-<title>Raft - 6.824 Lab2C - Roy&#39;s Repo</title>
-
-
-<meta name="author" content="Roy Liang" />
-
-
-<meta name="description" content="The Blog of Roy Liang" />
-
-
-<meta name="keywords" content="Distributed System" />
-
-
-<meta property="og:title" content="Raft - 6.824 Lab2C" />
-<meta name="twitter:title" content="Raft - 6.824 Lab2C" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab2c/" /><meta property="og:description" content="This post is about part C of Lab2 of MIT 6.824, Distributed Systems. For previous two parts, please refer to Part A and B. In this one we are focusing on Persist in Raft. The implementation would mostly follow the figure 2 in the paper as well." />
-<meta name="twitter:description" content="This post is about part C of Lab2 of MIT 6.824, Distributed Systems. For previous two parts, please refer to Part A and B. In this one we are focusing on Persist in Raft. The implementation would mostly follow the figure 2 in the paper as well." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2021-01-07T00:21:03-05:00" /><meta property="article:modified_time" content="2021-01-07T00:21:03-05:00" />
-
-
-<style>
-    @media (prefers-color-scheme: dark) {
-        body[data-theme='auto'] img {
-            filter: brightness(60%);
-        }
-    }
-
-    body[data-theme='dark'] img {
-        filter: brightness(60%);
-    }
-</style>
-
-
-
-<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
-
-
-
-
-
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'G-BJCGN2DM5Q');
-</script>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>Raft - 6.824 Lab2C - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="Distributed System">
+<meta property="og:title" content="Raft - 6.824 Lab2C">
+<meta name=twitter:title content="Raft - 6.824 Lab2C">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab2c/"><meta property="og:description" content="This post is about part C of Lab2 of MIT 6.824, Distributed Systems. For previous two parts, please refer to Part A and B. In this one we are focusing on Persist in Raft. The implementation would mostly follow the figure 2 in the paper as well.">
+<meta name=twitter:description content="This post is about part C of Lab2 of MIT 6.824, Distributed Systems. For previous two parts, please refer to Part A and B. In this one we are focusing on Persist in Raft. The implementation would mostly follow the figure 2 in the paper as well."><meta name=twitter:card content="summary"><meta property="article:published_time" content="2021-01-07T00:21:03-05:00"><meta property="article:modified_time" content="2021-01-07T00:21:03-05:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
-
-
 </head>
-
-<body data-theme="auto">
-    <script data-cfasync="false">
-  
-  var fujiThemeData = localStorage.getItem('fuji_data-theme');
-  
-  if (!fujiThemeData) {
-    localStorage.setItem('fuji_data-theme', 'auto');
-  } else {
-    
-    if (fujiThemeData !== 'auto') {
-      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
-    }
-  }
-</script>
-    <header>
-    <div class="container-lg clearfix">
-        <div class="col-12 header">
-            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
-            
-            <span class="title-sub">Share some thoughts</span>
-            
-        </div>
-    </div>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
 </header>
-
-    <main>
-        <div class="container-lg clearfix">
-            
-            <div class="col-12 col-md-9 float-left content">
-                
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
 <article>
-    
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/6.824_lab2c/">Raft - 6.824 Lab2C</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1059 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
-
-    </div>
-    
-    <div class="post-content markdown-body">
-        <p>This post is about part C of Lab2 of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to <a href="/post/6.824_lab2ab/">Part A and B</a>. In this one we are focusing on Persist in <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft</a>. The implementation would mostly follow the figure <em>2</em> in the paper as well.</p>
-<h2 id="persist">Persist</h2>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/6.824_lab2c/>Raft - 6.824 Lab2C</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-01-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1059 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/distributed-system>Distributed System</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p>This post is about part C of Lab2 of <a href=https://pdos.csail.mit.edu/6.824/index.html target=_blank>MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to <a href=/post/6.824_lab2ab/>Part A and B</a>. In this one we are focusing on Persist in <a href=https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf target=_blank>Raft</a>. The implementation would mostly follow the figure <em>2</em> in the paper as well.</p>
+<h2 id=persist>Persist</h2>
 <p>It&rsquo;s inevitable to have some machines crashed or rebooted in the clusters. We need to persist some important state so that nodes can begin at the place it crashed and rejoin the cluster again.</p>
 <p>As <em>Persistent state on all servers</em> mentioned in figure <em>2</em>, there three state to persist:</p>
 <ul>
@@ -132,9 +66,9 @@
 <p><code>log[]</code>: if the node has the majority of committed logs, we need to ensure the future <code>leader</code> can see them</p>
 </li>
 </ul>
-<h2 id="implementation-in-the-lab">Implementation in the Lab</h2>
+<h2 id=implementation-in-the-lab>Implementation in the Lab</h2>
 <p>Following the comments in function <code>persist()</code> and <code>readPersist()</code> of <em>raft.go</em>, we can fill the functions.</p>
-<pre><code class="language-go">//
+<pre><code class=language-go>//
 // save Raft's persistent state to stable storage,
 // where it can later be retrieved after a crash and restart.
 // see paper's Figure 2 for a description of what should be persistent.
@@ -179,12 +113,12 @@ func (rf *Raft) readPersist(data []byte) {
 }
 </code></pre>
 <p><code>persist()</code> needs to be called once one of the three variables listed above gets updated. And <code>readPersist()</code> should be called when <code>Make()</code> gets called.</p>
-<h2 id="optimization">Optimization</h2>
+<h2 id=optimization>Optimization</h2>
 <p>Some tests still get failed sometimes, below are the optimization on top of implementation following figure <em>2</em> to omit the failures.</p>
-<h3 id="log-disagreement">Log disagreement</h3>
-<p>Sometimes the test would fail because taking too long to reach an agreement. You can follow the instructions in the <a href="https://thesquareplanet.com/blog/students-guide-to-raft/#an-aside-on-optimizations" target="_blank">An aside on optimizations</a> in the post <em>Students&rsquo; Guide to Raft</em> mentioned in the handout. Add two extra variables in <code>AppendEntriesRPC</code> reply: <code>ConflictTerm</code> and <code>ConflictIndex</code> to speed up decrement in stead of decreasing one term per round.</p>
+<h3 id=log-disagreement>Log disagreement</h3>
+<p>Sometimes the test would fail because taking too long to reach an agreement. You can follow the instructions in the <a href=https://thesquareplanet.com/blog/students-guide-to-raft/#an-aside-on-optimizations target=_blank>An aside on optimizations</a> in the post <em>Students' Guide to Raft</em> mentioned in the handout. Add two extra variables in <code>AppendEntriesRPC</code> reply: <code>ConflictTerm</code> and <code>ConflictIndex</code> to speed up decrement in stead of decreasing one term per round.</p>
 <p>So at <code>leader</code> side we have:</p>
-<pre><code class="language-go">// Check if the leader has a log at the ConflitTerm
+<pre><code class=language-go>// Check if the leader has a log at the ConflitTerm
 // and get the last entry in the term
 lastIdx := rf.searchLastEntryInTerm(reply.ConflictTerm)
 if firstIndex != -1 {
@@ -198,7 +132,7 @@ if firstIndex != -1 {
 }
 </code></pre>
 <p>And at the <code>follower</code> side:</p>
-<pre><code class="language-go">if args.PreLogIndex &gt; lastIdx {
+<pre><code class=language-go>if args.PreLogIndex &gt; lastIdx {
     // The expected PreLogIndex &gt; actual last index on follower
     // Ask for decrement
     reply.IsSuccess = false
@@ -214,9 +148,9 @@ if firstIndex != -1 {
     // ...
 }
 </code></pre>
-<h3 id="commitindex-persist"><code>commitIndex</code> Persist</h3>
+<h3 id=commitindex-persist><code>commitIndex</code> Persist</h3>
 <p>An other failure I sometimes met in the test <code>TestFigure82C</code> is the apply error:</p>
-<pre><code class="language-shell">Test (2C): Figure 8 ...
+<pre><code class=language-shell>Test (2C): Figure 8 ...
 
 2021/01/06 23:22:04 apply error: commit index=5 server=4 3879934624216030722 != server=3 6543482455276445645
 exit status 1
@@ -251,10 +185,10 @@ exit status 1
 <p>Since s3 restarts, it&rsquo;s <code>commitIndex</code> gets reset to 0. So s2 will try to let s1 overwrite command{5} with command{4}. As now s1&rsquo;s <code>commitIndex</code> is 0. It will commit the log at the same index again.</p>
 </li>
 </ol>
-<p>To solve this problem, when calling <code>persist()</code>, add <code>rf.commitIndex</code> as well. So the node is aware of  how many logs have been committed after reboot. And it will reject    <code>AppendEntriesRPC</code> request where <code>args.PreLogIndex &lt; rf.commitIndex</code>, thinking it the same as the request with a smaller term number.</p>
-<h3 id="unreliable-network">Unreliable Network</h3>
+<p>To solve this problem, when calling <code>persist()</code>, add <code>rf.commitIndex</code> as well. So the node is aware of how many logs have been committed after reboot. And it will reject <code>AppendEntriesRPC</code> request where <code>args.PreLogIndex &lt; rf.commitIndex</code>, thinking it the same as the request with a smaller term number.</p>
+<h3 id=unreliable-network>Unreliable Network</h3>
 <p>Besides, I sometimes have the failure where index out of range when trying to send <code>AppendEntriesRPC</code> and use <code>rf.nextIndex[i]</code> to slice the logs.</p>
-<pre><code class="language-shell">Test (2C): Figure 8 (unreliable) ...
+<pre><code class=language-shell>Test (2C): Figure 8 (unreliable) ...
 panic: runtime error: slice bounds out of range [303:115]
 
 goroutine 17137 [running]:
@@ -265,263 +199,198 @@ created by ~/6.824/src/raft.(*Raft).setStateLeader
 exit status 2
 </code></pre>
 <p>And this error would only happen when having an unreliable network. When checking the log, I see it&rsquo;s because <code>rf.nextIndex[i]</code> get increased multiple times while trying to send <code>AppendEntriesRPC</code> to <code>follower</code>. After review the code, I see:</p>
-<pre><code class="language-go">if reply.IsSuccess {
+<pre><code class=language-go>if reply.IsSuccess {
     rf.nextIndex[i] += len(args.Entries)
 }
 </code></pre>
 <p>This is the reason why this error showed up. The replies of multiple heartbeat request may comes together and all of them works. So the <code>nextIndex</code> got updated multiple times.</p>
 <p>The easiest fix is using the values in the request directly to set instead of addition.</p>
-<pre><code class="language-go">// In case of unreliable network, running multiple times
+<pre><code class=language-go>// In case of unreliable network, running multiple times
 rf.nextIndex[i] = args.PrevLogIndex + len(args.Entries) + 1
 </code></pre>
-<h2 id="references">References</h2>
+<h2 id=references>References</h2>
 <ol>
-<li><a href="https://thesquareplanet.com/blog/students-guide-to-raft" target="_blank">Students&rsquo; Guide to Raft</a></li>
+<li><a href=https://thesquareplanet.com/blog/students-guide-to-raft target=_blank>Students' Guide to Raft</a></li>
 </ol>
-    </div>
-</article>
-
-
-<div class="license markdown-body">
-    <blockquote>
-        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-               target="_blank">CC BY-NC-SA 4.0</a>.</p>
-    </blockquote>
 </div>
-
-
-
-            </div>
-            <aside class="col-12 col-md-3 float-left sidebar">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3><nav id="TableOfContents">
-  <ul>
-    <li><a href="#persist">Persist</a></li>
-    <li><a href="#implementation-in-the-lab">Implementation in the Lab</a></li>
-    <li><a href="#optimization">Optimization</a>
-      <ul>
-        <li><a href="#log-disagreement">Log disagreement</a></li>
-        <li><a href="#commitindex-persist"><code>commitIndex</code> Persist</a></li>
-        <li><a href="#unreliable-network">Unreliable Network</a></li>
-      </ul>
-    </li>
-    <li><a href="#references">References</a></li>
-  </ul>
+</article>
+<div class="license markdown-body">
+<blockquote>
+<p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p>
+</blockquote>
+</div>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3><nav id=TableOfContents>
+<ul>
+<li><a href=#persist>Persist</a></li>
+<li><a href=#implementation-in-the-lab>Implementation in the Lab</a></li>
+<li><a href=#optimization>Optimization</a>
+<ul>
+<li><a href=#log-disagreement>Log disagreement</a></li>
+<li><a href=#commitindex-persist><code>commitIndex</code> Persist</a></li>
+<li><a href=#unreliable-network>Unreliable Network</a></li>
+</ul>
+</li>
+<li><a href=#references>References</a></li>
+</ul>
 </nav></div>
 </aside>
-        </div>
-        <div class="btn">
-    <div class="btn-menu" id="btn-menu">
-        <i class="iconfont icon-grid-sharp"></i>
-    </div>
-    <div class="btn-toggle-mode">
-        <i class="iconfont icon-contrast-sharp"></i>
-    </div>
-    <div class="btn-scroll-top">
-        <i class="iconfont icon-chevron-up-circle-sharp"></i>
-    </div>
 </div>
-<aside class="sidebar-mobile" style="display: none;">
-  <div class="sidebar-wrapper">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    
-    
-    
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3>
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#persist">Persist</a></li>
-    <li><a href="#implementation-in-the-lab">Implementation in the Lab</a></li>
-    <li><a href="#optimization">Optimization</a>
-      <ul>
-        <li><a href="#log-disagreement">Log disagreement</a></li>
-        <li><a href="#commitindex-persist"><code>commitIndex</code> Persist</a></li>
-        <li><a href="#unreliable-network">Unreliable Network</a></li>
-      </ul>
-    </li>
-    <li><a href="#references">References</a></li>
-  </ul>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#persist>Persist</a></li>
+<li><a href=#implementation-in-the-lab>Implementation in the Lab</a></li>
+<li><a href=#optimization>Optimization</a>
+<ul>
+<li><a href=#log-disagreement>Log disagreement</a></li>
+<li><a href=#commitindex-persist><code>commitIndex</code> Persist</a></li>
+<li><a href=#unreliable-network>Unreliable Network</a></li>
+</ul>
+</li>
+<li><a href=#references>References</a></li>
+</ul>
 </nav>
-    </div>
-    
-    
-  </div>
+</div>
+</div>
 </aside>
-    </main>
-
-    <footer>
-    <div class="container-lg clearfix">
-        <div class="col-12 footer">
-            
-            <span>&copy; 2019-2022
-                <a href="https://lianglouise.github.io/">Roy Liang</a>
-                 | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
-                | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
-                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
-                                                    target="_blank">Hugo</a> 
-            </span>
-        </div>
-    </div>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2023
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
 </footer>
-
-    
-<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
-
-
-<script defer src="/assets/js/fuji.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body);"
-></script>
-
-
-
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
 </body>
-
 </html>

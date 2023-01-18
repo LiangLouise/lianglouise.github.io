@@ -1,146 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Roy&#39;s Repo</title>
-    <link>https://lianglouise.github.io/</link>
-    <description>Recent content on Roy&#39;s Repo</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://lianglouise.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Hash Table in Pintos</title>
-      <link>https://lianglouise.github.io/post/hash_table_in_pintos/</link>
-      <pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/hash_table_in_pintos/</guid>
-      <description>&lt;p&gt;Apart from the &lt;a href=&#34;https://lianglouise.github.io/post/6.list_in_pintos/&#34;&gt;linked list&lt;/a&gt;, there is another handful structure offered by Pintos kernel library - &lt;em&gt;Hash Table&lt;/em&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>What&#39;s The Hottest Anime in Each Season?</title>
-      <link>https://lianglouise.github.io/post/d25_data_story/</link>
-      <pubDate>Sun, 05 Dec 2021 11:02:17 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/d25_data_story/</guid>
-      <description>Abstract No matter for what kind of many screenplays, the most common topics among those watcher or fans are probably:
- Which xxx is the best? Which xxx do you recommend? Do you think what&amp;rsquo;s the best xxx of 2021?  xxx here can be substituted by any type of screenplays, i.e. movies, TV series, TV show and etc. This rule applies to one type of screenplays as well - TV anime.
-In this post, I would present my analysis on what&amp;rsquo;s most welcomed TV animes in different period of time and what are the potential features make them become popular among viewers, with the help the data from anime community in Reddit and anime record data.</description>
-    </item>
-    
-    <item>
-      <title>About Me</title>
-      <link>https://lianglouise.github.io/about/</link>
-      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://lianglouise.github.io/about/</guid>
-      <description>I am a recent graduate from University of Toronto Scarborough.
-Currently, I am focusing on find out a job :) and learning C++.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Roy's Repo</title><link>https://lianglouise.github.io/</link><description>Recent content on Roy's Repo</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 21 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://lianglouise.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Hash Table in Pintos</title><link>https://lianglouise.github.io/post/hash_table_in_pintos/</link><pubDate>Mon, 21 Mar 2022 00:00:00 +0000</pubDate><guid>https://lianglouise.github.io/post/hash_table_in_pintos/</guid><description>&lt;p>Apart from the &lt;a href="https://lianglouise.github.io/post/6.list_in_pintos/">linked list&lt;/a>, there is another handful structure offered by Pintos kernel library - &lt;em>Hash Table&lt;/em>.&lt;/p></description></item><item><title>Email and GPG Keys</title><link>https://lianglouise.github.io/gpg_email/</link><pubDate>Mon, 17 Jan 2022 00:00:00 +0000</pubDate><guid>https://lianglouise.github.io/gpg_email/</guid><description>You can reach out to me through my university email royliang5@gmail.com (with the email&amp;rsquo;s GPG Key).
+The Key&amp;rsquo;s finger print is 6B358BCB61DD4242896AE742A228529A7D2DABD3.</description></item><item><title>What's The Hottest Anime in Each Season?</title><link>https://lianglouise.github.io/post/d25_data_story/</link><pubDate>Sun, 05 Dec 2021 11:02:17 -0500</pubDate><guid>https://lianglouise.github.io/post/d25_data_story/</guid><description>Abstract No matter for what kind of many screenplays, the most common topics among those watcher or fans are probably:
+Which xxx is the best? Which xxx do you recommend? Do you think what&amp;rsquo;s the best xxx of 2021? xxx here can be substituted by any type of screenplays, i.e. movies, TV series, TV show and etc. This rule applies to one type of screenplays as well - TV anime.
+In this post, I would present my analysis on what&amp;rsquo;s most welcomed TV animes in different period of time and what are the potential features make them become popular among viewers, with the help the data from anime community in Reddit and anime record data.</description></item><item><title>About Me</title><link>https://lianglouise.github.io/about/</link><pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate><guid>https://lianglouise.github.io/about/</guid><description>I am a recent graduate from University of Toronto Scarborough.
+Currently, I am working at Huawei Canada.
 You may also get a pdf version Resume here.
-Education  September 2017 - December 2021  Candidate, Honors Bachelor of Science
+Education September 2017 - December 2021 Candidate, Honors Bachelor of Science
 University of Toronto Scarborough
- Computer Science Specialist Co-op Program, Software Engineering Stream, 4th Year;
-    Professional  Sept 2021 - Dec 2021  Teaching Assistant; University of Toronto Scarborough
+Computer Science Specialist Co-op Program, Software Engineering Stream, 4th Year;
+Professional Sept 2021 - Dec 2021 Teaching Assistant; University of Toronto Scarborough
 Teaching Assistant of Course CSCD27: Computer and Network Security;
 Hosted Weekly tutorials and practical sessions and assisted on course project improvement.
-Technical Environment: CTF, Crypto, and OS &amp; Network Security.</description>
-    </item>
-    
-    <item>
-      <title>List in Pintos</title>
-      <link>https://lianglouise.github.io/post/list_in_pintos/</link>
-      <pubDate>Fri, 30 Jul 2021 21:22:57 -0400</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/list_in_pintos/</guid>
-      <description>&lt;p&gt;This post is about an important data structure, embedded linked list, which is used massively in the pintos project amd offers a different idea how to create dynamic list in C. But its design usually made it easy to confuse the people at first, so it&amp;rsquo;s very interesting to look into its implementation.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Meeting With Me</title>
-      <link>https://lianglouise.github.io/meeting/</link>
-      <pubDate>Fri, 25 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://lianglouise.github.io/meeting/</guid>
-      <description>Please book your time below.
-  </description>
-    </item>
-    
-    <item>
-      <title>KV Raft - 6.824 Lab3A</title>
-      <link>https://lianglouise.github.io/post/6.824_lab3a/</link>
-      <pubDate>Wed, 10 Feb 2021 23:44:05 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/6.824_lab3a/</guid>
-      <description>&lt;p&gt;This post is about part A of Lab3 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag &lt;a href=&#34;https://lianglouise.github.io/tags/distributed-system/&#34;&gt;Distributed System&lt;/a&gt;. In this post, we are to build a fault tolerant key-value services on top of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Raft - 6.824 Lab2C</title>
-      <link>https://lianglouise.github.io/post/6.824_lab2c/</link>
-      <pubDate>Thu, 07 Jan 2021 00:21:03 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/6.824_lab2c/</guid>
-      <description>&lt;p&gt;This post is about part C of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. For previous two parts, please refer to &lt;a href=&#34;https://lianglouise.github.io/post/6.824_lab2ab/&#34;&gt;Part A and B&lt;/a&gt;. In this one we are focusing on Persist in &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. The implementation would mostly follow the figure &lt;em&gt;2&lt;/em&gt; in the paper as well.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Raft - 6.824 Lab2A 2B</title>
-      <link>https://lianglouise.github.io/post/6.824_lab2ab/</link>
-      <pubDate>Sat, 02 Jan 2021 21:45:49 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/6.824_lab2ab/</guid>
-      <description>&lt;p&gt;This post is about part A and B of Lab2 of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34; target=&#34;_blank&#34;&gt;Raft&lt;/a&gt;. Here in these two part, we only discuss the section up to the end of section &lt;em&gt;5&lt;/em&gt; in the paper.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>MapReduce - 6.824 Lab1</title>
-      <link>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</link>
-      <pubDate>Wed, 23 Dec 2020 22:00:17 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</guid>
-      <description>&lt;p&gt;This is the first lab of &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/index.html&#34; target=&#34;_blank&#34;&gt;MIT 6.824&lt;/a&gt;, Distributed Systems. It is about the implementation of &lt;a href=&#34;http://research.google.com/archive/mapreduce-osdi04.pdf&#34; target=&#34;_blank&#34;&gt;MapReduce&lt;/a&gt;, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &amp;ldquo;cheap&amp;rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience of it.&lt;/p&gt;
-&lt;p&gt;A very classic use case of this framework is counting words in a large file, which is also what we are to implement.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</title>
-      <link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</link>
-      <pubDate>Tue, 10 Nov 2020 23:13:55 -0500</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</guid>
-      <description>&lt;p&gt;After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.&lt;/p&gt;
-&lt;p&gt;So what&amp;rsquo;s next?&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Some Practice on Implementing Signal Protocol With Python (1): X3DH</title>
-      <link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</link>
-      <pubDate>Tue, 20 Oct 2020 18:27:11 -0400</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</guid>
-      <description>&lt;p&gt;Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - &lt;a href=&#34;https://signal.org/docs/&#34; target=&#34;_blank&#34;&gt;Signal Protocol&lt;/a&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Email and GPG Keys</title>
-      <link>https://lianglouise.github.io/gpg_email/</link>
-      <pubDate>Tue, 20 Oct 2020 19:15:32 +0800</pubDate>
-      
-      <guid>https://lianglouise.github.io/gpg_email/</guid>
-      <description>You can reach out to me through my university email jiasong.liang@mail.utoronto.ca (with the email&amp;rsquo;s GPG Key).
-The Key&amp;rsquo;s finger print is 4EE3 1C4E EDC3 F95B E281 E12A 3690 4D4E E025 9927.</description>
-    </item>
-    
-    <item>
-      <title>Hello-World!</title>
-      <link>https://lianglouise.github.io/post/hello_world/</link>
-      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://lianglouise.github.io/post/hello_world/</guid>
-      <description>Welcome to my github page.
+Technical Environment: CTF, Crypto, and OS &amp; Network Security.</description></item><item><title>List in Pintos</title><link>https://lianglouise.github.io/post/list_in_pintos/</link><pubDate>Fri, 30 Jul 2021 21:22:57 -0400</pubDate><guid>https://lianglouise.github.io/post/list_in_pintos/</guid><description>&lt;p>This post is about an important data structure, embedded linked list, which is used massively in the pintos project amd offers a different idea how to create dynamic list in C. But its design usually made it easy to confuse the people at first, so it&amp;rsquo;s very interesting to look into its implementation.&lt;/p></description></item><item><title>Meeting With Me</title><link>https://lianglouise.github.io/meeting/</link><pubDate>Fri, 25 Jun 2021 00:00:00 +0000</pubDate><guid>https://lianglouise.github.io/meeting/</guid><description>Please book your time below.</description></item><item><title>KV Raft - 6.824 Lab3A</title><link>https://lianglouise.github.io/post/6.824_lab3a/</link><pubDate>Wed, 10 Feb 2021 23:44:05 -0500</pubDate><guid>https://lianglouise.github.io/post/6.824_lab3a/</guid><description>&lt;p>This post is about part A of Lab3 of &lt;a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824&lt;/a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag &lt;a href="https://lianglouise.github.io/tags/distributed-system/">Distributed System&lt;/a>. In this post, we are to build a fault tolerant key-value services on top of &lt;a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft&lt;/a>.&lt;/p></description></item><item><title>Raft - 6.824 Lab2C</title><link>https://lianglouise.github.io/post/6.824_lab2c/</link><pubDate>Thu, 07 Jan 2021 00:21:03 -0500</pubDate><guid>https://lianglouise.github.io/post/6.824_lab2c/</guid><description>&lt;p>This post is about part C of Lab2 of &lt;a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824&lt;/a>, Distributed Systems. For previous two parts, please refer to &lt;a href="https://lianglouise.github.io/post/6.824_lab2ab/">Part A and B&lt;/a>. In this one we are focusing on Persist in &lt;a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft&lt;/a>. The implementation would mostly follow the figure &lt;em>2&lt;/em> in the paper as well.&lt;/p></description></item><item><title>Raft - 6.824 Lab2A 2B</title><link>https://lianglouise.github.io/post/6.824_lab2ab/</link><pubDate>Sat, 02 Jan 2021 21:45:49 -0500</pubDate><guid>https://lianglouise.github.io/post/6.824_lab2ab/</guid><description>&lt;p>This post is about part A and B of Lab2 of &lt;a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824&lt;/a>, Distributed Systems. It is about the implementation of &lt;a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft&lt;/a>. Here in these two part, we only discuss the section up to the end of section &lt;em>5&lt;/em> in the paper.&lt;/p></description></item><item><title>MapReduce - 6.824 Lab1</title><link>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</link><pubDate>Wed, 23 Dec 2020 22:00:17 -0500</pubDate><guid>https://lianglouise.github.io/post/6.824_lab1_mapreduce/</guid><description>&lt;p>This is the first lab of &lt;a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824&lt;/a>, Distributed Systems. It is about the implementation of &lt;a href="http://research.google.com/archive/mapreduce-osdi04.pdf" target="_blank">MapReduce&lt;/a>, a framework introduced by Google that can process huge volume of data parallelly by splitting a single task to multiple small ones and assigning them to a cluster of &amp;ldquo;cheap&amp;rdquo; machines. And by using this framework, also as mentioned in the paper, this lets programmer make use of distributed system without the need of experience of it.&lt;/p>
+&lt;p>A very classic use case of this framework is counting words in a large file, which is also what we are to implement.&lt;/p></description></item><item><title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</title><link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</link><pubDate>Tue, 10 Nov 2020 23:13:55 -0500</pubDate><guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/</guid><description>&lt;p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.&lt;/p>
+&lt;p>So what&amp;rsquo;s next?&lt;/p></description></item><item><title>Some Practice on Implementing Signal Protocol With Python (1): X3DH</title><link>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</link><pubDate>Tue, 20 Oct 2020 18:27:11 -0400</pubDate><guid>https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/</guid><description>&lt;p>Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - &lt;a href="https://signal.org/docs/" target="_blank">Signal Protocol&lt;/a>.&lt;/p></description></item><item><title>Hello-World!</title><link>https://lianglouise.github.io/post/hello_world/</link><pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate><guid>https://lianglouise.github.io/post/hello_world/</guid><description>Welcome to my github page.
 Finally! At the end of 2019, I managed to launched my personal blog with the help of Hexo and archer theme. with the help of Hugo and Fuji theme.
 I will share my naive thoughts and experiences on coding here. 😜
-Hope you could find something helpful and interesting.</description>
-    </item>
-    
-  </channel>
-</rss>
+Hope you could find something helpful and interesting.</description></item></channel></rss>

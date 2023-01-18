@@ -1,130 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html><html lang=en>
 <head>
-    
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="HandheldFriendly" content="True" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.96.0" />
-
-
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-<link rel="manifest" href="/favicon/site.webmanifest">
-<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="shortcut icon" href="/favicon/favicon.ico">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-config" content="/favicon/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">
-
-
-<title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet - Roy&#39;s Repo</title>
-
-
-<meta name="author" content="Roy Liang" />
-
-
-<meta name="description" content="The Blog of Roy Liang" />
-
-
-<meta name="keywords" content="web, security" />
-
-
-<meta property="og:title" content="Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet" />
-<meta name="twitter:title" content="Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/" /><meta property="og:description" content="After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.
-So what&rsquo;s next?" />
-<meta name="twitter:description" content="After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.
-So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2020-11-10T23:13:55-05:00" /><meta property="article:modified_time" content="2020-11-10T23:13:55-05:00" />
-
-
-<style>
-    @media (prefers-color-scheme: dark) {
-        body[data-theme='auto'] img {
-            filter: brightness(60%);
-        }
-    }
-
-    body[data-theme='dark'] img {
-        filter: brightness(60%);
-    }
-</style>
-
-
-
-<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
-
-
-
-
-
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'G-BJCGN2DM5Q');
-</script>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="web,security">
+<meta property="og:title" content="Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet">
+<meta name=twitter:title content="Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/"><meta property="og:description" content="After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.
+So what&rsquo;s next?">
+<meta name=twitter:description content="After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.
+So what&rsquo;s next?"><meta name=twitter:card content="summary"><meta property="article:published_time" content="2020-11-10T23:13:55-05:00"><meta property="article:modified_time" content="2020-11-10T23:13:55-05:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
-
-
 </head>
-
-<body data-theme="auto">
-    <script data-cfasync="false">
-  
-  var fujiThemeData = localStorage.getItem('fuji_data-theme');
-  
-  if (!fujiThemeData) {
-    localStorage.setItem('fuji_data-theme', 'auto');
-  } else {
-    
-    if (fujiThemeData !== 'auto') {
-      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
-    }
-  }
-</script>
-    <header>
-    <div class="container-lg clearfix">
-        <div class="col-12 header">
-            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
-            
-            <span class="title-sub">Share some thoughts</span>
-            
-        </div>
-    </div>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
 </header>
-
-    <main>
-        <div class="container-lg clearfix">
-            
-            <div class="col-12 col-md-9 float-left content">
-                
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
 <article>
-    
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/">Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-11-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1099 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/web">web</a>&nbsp;<a href="/tags/security">security</a>&nbsp;</span>
-
-    </div>
-    
-    <div class="post-content markdown-body">
-        <p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.</p>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-11-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1099 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/web>web</a>&nbsp;<a href=/tags/security>security</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.</p>
 <p>So what&rsquo;s next?</p>
 <p>The easiest solution is do as TLS: client and server share client_write_{key, iv} and server_write_{key, iv} and use a per-record sequence number to encrypt and decrypt messages in the session. However, as said in the previous post, in the situation of instant messaging software, one side of client may be offline for a long time. As a result , there exist some risk that once the client_write_{key, iv} and server_write_{key, iv} are compromised (though it&rsquo;s kind of hard by brute forcing), all the future messages will be transparent to Mallory.</p>
-<p>Thus, it&rsquo;s very important to introduce an algorithm that add extra entropy while don&rsquo;t have handshake again to generate a new master secret (which is quite expensive). This is why <a href="https://signal.org/docs/specifications/doubleratchet/" target="_blank">Double Ratchet</a> was designed.</p>
+<p>Thus, it&rsquo;s very important to introduce an algorithm that add extra entropy while don&rsquo;t have handshake again to generate a new master secret (which is quite expensive). This is why <a href=https://signal.org/docs/specifications/doubleratchet/ target=_blank>Double Ratchet</a> was designed.</p>
 <p>Here I am using Double Ratchet without header encrypted as example.</p>
-<h2 id="the-key-chain">The Key Chain</h2>
+<h2 id=the-key-chain>The Key Chain</h2>
 <p>The most important thing in Double Ratchet is maintaining key chains with three properties:</p>
 <ul>
 <li>
@@ -150,16 +84,16 @@ So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta pro
 </li>
 </ol>
 <p>Here <code>writing chain</code> and <code>reading chain</code> are very similar. They are both symmetric chains as their value only depends on the output value from root chain and previous write/read key.</p>
-<p><img class="img-zoomable" src="imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/s_kdf.png" alt="s_kdf.png" />
+<p><img class=img-zoomable src=imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/s_kdf.png alt=s_kdf.png>
 </p>
 <p>The reason to introduce <code>root chain</code> is that <code>writing chain</code> and <code>reading chain</code> are both symmetric, once Mallory managed to steal some KDF output, this is no forward secrecy. However, The root chain&rsquo;s key value depends on the previous root key and a new key generated by DH exchange (e.g. X22519). This will ensure that there won&rsquo;t be a too long <code>writing chain</code> or <code>reading chain</code>.</p>
-<p><img class="img-zoomable" src="imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/dh_kdf.png" alt="dh_kdf.png" />
+<p><img class=img-zoomable src=imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/dh_kdf.png alt=dh_kdf.png>
 </p>
 <p>As shown in the picture above, the new root key and new write/read key will be generated once Bob send a new X25519 Public key in the header of a new message.</p>
-<h2 id="state-storing">State Storing</h2>
+<h2 id=state-storing>State Storing</h2>
 <p>It&rsquo;s very important to keep track of chains so the program can tell use which key to encrypt or decrypt:</p>
 <p>For each user we need keep a record like this:</p>
-<pre><code class="language-json">{
+<pre><code class=language-json>{
     &quot;bob&quot;: {
       &quot;RK&quot;: &quot;The latest rook key input material&quot;,
       &quot;DH_pair&quot;: [&quot;Alice's current private key&quot;, &quot;Alice's current public key&quot;],
@@ -173,7 +107,7 @@ So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta pro
 <p>It&rsquo;s update to you decide, the max number of <code>write key</code> and <code>read key</code> to keep in the list</p>
 <p>Note: we just need save the latest <code>root key</code> as for previous rounds <code>write key</code> or <code>read key</code> has been generated. So does <code>DH_pair</code>.</p>
 <p>Then in code:</p>
-<pre><code class="language-python"># Continue in Class Client from previous
+<pre><code class=language-python># Continue in Class Client from previous
 
     def dr_state_initialize(self, user_name, RK, DH_pair, DH_p):
     self.dr_keys[user_name] = {
@@ -187,7 +121,7 @@ So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta pro
         &quot;PN&quot;: 0
     }
 </code></pre>
-<h3 id="integration-with-x3dh">Integration with X3DH</h3>
+<h3 id=integration-with-x3dh>Integration with X3DH</h3>
 <p>Double Ratchet is usually integrated with X3DH. We can initialize user state with the result from X3DH.</p>
 <ul>
 <li>
@@ -205,9 +139,9 @@ So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta pro
 </ul>
 </li>
 </ul>
-<h2 id="core-functions">Core Functions</h2>
-<p>Following are the core functions implemented following the <a href="https://signal.org/docs/specifications/doubleratchet/#recommended-cryptographic-algorithms" target="_blank">recommendations</a> from Signal.</p>
-<h3 id="key-generation-functions">Key Generation functions</h3>
+<h2 id=core-functions>Core Functions</h2>
+<p>Following are the core functions implemented following the <a href=https://signal.org/docs/specifications/doubleratchet/#recommended-cryptographic-algorithms target=_blank>recommendations</a> from Signal.</p>
+<h3 id=key-generation-functions>Key Generation functions</h3>
 <p>The KDF in the chains create new keys and iv to move the ratchet.</p>
 <ul>
 <li>
@@ -216,7 +150,7 @@ So what&rsquo;s next?" /><meta name="twitter:card" content="summary" /><meta pro
 <p>Both <code>32</code> bytes long</p>
 </li>
 </ul>
-<pre><code class="language-python">from Crypto.Protocol.KDF import HKDF
+<pre><code class=language-python>from Crypto.Protocol.KDF import HKDF
 
 def KDF_RK(rk, dh_out):
     out = HKDF(dh_out, 64, rk, SHA256, 1)
@@ -234,25 +168,25 @@ def KDF_RK(rk, dh_out):
 <p><code>mk</code>: use constant <code>b'\x02'</code> as message input.</p>
 </li>
 </ul>
-<pre><code class="language-python">from Crypto.Protocol.KDF import HKDF
+<pre><code class=language-python>from Crypto.Protocol.KDF import HKDF
 
 def KDF_CK(ck):
     ck_input_material = HMAC.new(ck, digestmod=SHA256).update(b'\x01').digest()
     mk = HMAC.new(ck, digestmod=SHA256).update(b'\x02').digest()
     return ck_input_material, mk
 </code></pre>
-<h3 id="data-encryption">Data Encryption</h3>
+<h3 id=data-encryption>Data Encryption</h3>
 <p>To generate the ciphertext in ENCRYPT() we need use <code>mk</code> to create keys <code>K</code> by:</p>
-<pre><code class="language-python">K = HKDF(mk, 80, b'\0' * 80, SHA256, 1)
+<pre><code class=language-python>K = HKDF(mk, 80, b'\0' * 80, SHA256, 1)
 </code></pre>
 <p>then sign <code>header||plaintext||dh_pub_b</code> using <code>HMAC.new(K[32:64], digestmod=SHA256)</code></p>
 <p>then pad <code>signature||plaintext</code> with empty bytes to make it fit AES Block Size,</p>
 <p>then encrypt <em>padded <code>signature||plaintext</code></em> using <code>AES.new(K[:32], AES.MODE_CBC, iv=K[64:])</code></p>
 <p>Finally concat ciphertext as:</p>
 <p><code>iv||AES(K[:32], Sig(K[32:64], header||plaintext||dh_pub_b), plaintext)</code>.</p>
-<h2 id="payload-format">Payload Format</h2>
+<h2 id=payload-format>Payload Format</h2>
 <p>We can use JSON to separate header and ciphertext:</p>
-<pre><code class="language-json">{
+<pre><code class=language-json>{
     &quot;header&quot;: {
         &quot;dh_p&quot;: &quot;&lt;New DH public key&gt;&quot;,
         &quot;pn&quot;: &quot;&lt;# of DH process to generate new root key(Including generating this message)&gt;&quot;,
@@ -261,7 +195,7 @@ def KDF_CK(ck):
     &quot;ciphertext&quot;: &quot;&lt;output of ENCRYPT(mk, plaintext, header)&gt;&quot;
 }
 </code></pre>
-<h2 id="ratchet-update">Ratchet Update</h2>
+<h2 id=ratchet-update>Ratchet Update</h2>
 <p>For each user, the key chains updated in the conditions below:</p>
 <ul>
 <li>
@@ -300,263 +234,198 @@ def KDF_CK(ck):
 </ul>
 </li>
 </ul>
-<h2 id="fin">Fin</h2>
+<h2 id=fin>Fin</h2>
 <p>Though Double Ratchet is quite complicated. But keep in mind that, this is like playing a ping-pong game, update the root key and stop using the latest write key chain only when the &lsquo;ball&rsquo; is back.</p>
 <p>Certainly, the double ratchet and X3DH can be more secure, compared to TLS. However, this still only protects the application layer. But it&rsquo;s still a very good solution since almost every key is dynamic in a long term session.</p>
-    </div>
-</article>
-
-
-<div class="license markdown-body">
-    <blockquote>
-        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-               target="_blank">CC BY-NC-SA 4.0</a>.</p>
-    </blockquote>
 </div>
-
-
-
-            </div>
-            <aside class="col-12 col-md-3 float-left sidebar">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3><nav id="TableOfContents">
-  <ul>
-    <li><a href="#the-key-chain">The Key Chain</a></li>
-    <li><a href="#state-storing">State Storing</a>
-      <ul>
-        <li><a href="#integration-with-x3dh">Integration with X3DH</a></li>
-      </ul>
-    </li>
-    <li><a href="#core-functions">Core Functions</a>
-      <ul>
-        <li><a href="#key-generation-functions">Key Generation functions</a></li>
-        <li><a href="#data-encryption">Data Encryption</a></li>
-      </ul>
-    </li>
-    <li><a href="#payload-format">Payload Format</a></li>
-    <li><a href="#ratchet-update">Ratchet Update</a></li>
-    <li><a href="#fin">Fin</a></li>
-  </ul>
+</article>
+<div class="license markdown-body">
+<blockquote>
+<p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p>
+</blockquote>
+</div>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3><nav id=TableOfContents>
+<ul>
+<li><a href=#the-key-chain>The Key Chain</a></li>
+<li><a href=#state-storing>State Storing</a>
+<ul>
+<li><a href=#integration-with-x3dh>Integration with X3DH</a></li>
+</ul>
+</li>
+<li><a href=#core-functions>Core Functions</a>
+<ul>
+<li><a href=#key-generation-functions>Key Generation functions</a></li>
+<li><a href=#data-encryption>Data Encryption</a></li>
+</ul>
+</li>
+<li><a href=#payload-format>Payload Format</a></li>
+<li><a href=#ratchet-update>Ratchet Update</a></li>
+<li><a href=#fin>Fin</a></li>
+</ul>
 </nav></div>
 </aside>
-        </div>
-        <div class="btn">
-    <div class="btn-menu" id="btn-menu">
-        <i class="iconfont icon-grid-sharp"></i>
-    </div>
-    <div class="btn-toggle-mode">
-        <i class="iconfont icon-contrast-sharp"></i>
-    </div>
-    <div class="btn-scroll-top">
-        <i class="iconfont icon-chevron-up-circle-sharp"></i>
-    </div>
 </div>
-<aside class="sidebar-mobile" style="display: none;">
-  <div class="sidebar-wrapper">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    
-    
-    
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3>
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#the-key-chain">The Key Chain</a></li>
-    <li><a href="#state-storing">State Storing</a>
-      <ul>
-        <li><a href="#integration-with-x3dh">Integration with X3DH</a></li>
-      </ul>
-    </li>
-    <li><a href="#core-functions">Core Functions</a>
-      <ul>
-        <li><a href="#key-generation-functions">Key Generation functions</a></li>
-        <li><a href="#data-encryption">Data Encryption</a></li>
-      </ul>
-    </li>
-    <li><a href="#payload-format">Payload Format</a></li>
-    <li><a href="#ratchet-update">Ratchet Update</a></li>
-    <li><a href="#fin">Fin</a></li>
-  </ul>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#the-key-chain>The Key Chain</a></li>
+<li><a href=#state-storing>State Storing</a>
+<ul>
+<li><a href=#integration-with-x3dh>Integration with X3DH</a></li>
+</ul>
+</li>
+<li><a href=#core-functions>Core Functions</a>
+<ul>
+<li><a href=#key-generation-functions>Key Generation functions</a></li>
+<li><a href=#data-encryption>Data Encryption</a></li>
+</ul>
+</li>
+<li><a href=#payload-format>Payload Format</a></li>
+<li><a href=#ratchet-update>Ratchet Update</a></li>
+<li><a href=#fin>Fin</a></li>
+</ul>
 </nav>
-    </div>
-    
-    
-  </div>
+</div>
+</div>
 </aside>
-    </main>
-
-    <footer>
-    <div class="container-lg clearfix">
-        <div class="col-12 footer">
-            
-            <span>&copy; 2019-2022
-                <a href="https://lianglouise.github.io/">Roy Liang</a>
-                 | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
-                | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
-                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
-                                                    target="_blank">Hugo</a> 
-            </span>
-        </div>
-    </div>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2023
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
 </footer>
-
-    
-<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
-
-
-<script defer src="/assets/js/fuji.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body);"
-></script>
-
-
-
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
 </body>
-
 </html>

@@ -1,126 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html><html lang=en>
 <head>
-    
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="HandheldFriendly" content="True" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.96.0" />
-
-
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-<link rel="manifest" href="/favicon/site.webmanifest">
-<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="shortcut icon" href="/favicon/favicon.ico">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-config" content="/favicon/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">
-
-
-<title>KV Raft - 6.824 Lab3A - Roy&#39;s Repo</title>
-
-
-<meta name="author" content="Roy Liang" />
-
-
-<meta name="description" content="The Blog of Roy Liang" />
-
-
-<meta name="keywords" content="Distributed System" />
-
-
-<meta property="og:title" content="KV Raft - 6.824 Lab3A" />
-<meta name="twitter:title" content="KV Raft - 6.824 Lab3A" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab3a/" /><meta property="og:description" content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft." />
-<meta name="twitter:description" content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2021-02-10T23:44:05-05:00" /><meta property="article:modified_time" content="2021-02-10T23:44:05-05:00" />
-
-
-<style>
-    @media (prefers-color-scheme: dark) {
-        body[data-theme='auto'] img {
-            filter: brightness(60%);
-        }
-    }
-
-    body[data-theme='dark'] img {
-        filter: brightness(60%);
-    }
-</style>
-
-
-
-<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
-
-
-
-
-
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'G-BJCGN2DM5Q');
-</script>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>KV Raft - 6.824 Lab3A - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="Distributed System">
+<meta property="og:title" content="KV Raft - 6.824 Lab3A">
+<meta name=twitter:title content="KV Raft - 6.824 Lab3A">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/6.824_lab3a/"><meta property="og:description" content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft.">
+<meta name=twitter:description content="This post is about part A of Lab3 of MIT 6.824, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag Distributed System. In this post, we are to build a fault tolerant key-value services on top of Raft."><meta name=twitter:card content="summary"><meta property="article:published_time" content="2021-02-10T23:44:05-05:00"><meta property="article:modified_time" content="2021-02-10T23:44:05-05:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
-
-
 </head>
-
-<body data-theme="auto">
-    <script data-cfasync="false">
-  
-  var fujiThemeData = localStorage.getItem('fuji_data-theme');
-  
-  if (!fujiThemeData) {
-    localStorage.setItem('fuji_data-theme', 'auto');
-  } else {
-    
-    if (fujiThemeData !== 'auto') {
-      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
-    }
-  }
-</script>
-    <header>
-    <div class="container-lg clearfix">
-        <div class="col-12 header">
-            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
-            
-            <span class="title-sub">Share some thoughts</span>
-            
-        </div>
-    </div>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
 </header>
-
-    <main>
-        <div class="container-lg clearfix">
-            
-            <div class="col-12 col-md-9 float-left content">
-                
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
 <article>
-    
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/6.824_lab3a/">KV Raft - 6.824 Lab3A</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1284 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/distributed-system">Distributed System</a>&nbsp;</span>
-
-    </div>
-    
-    <div class="post-content markdown-body">
-        <p>This post is about part A of Lab3 of <a href="https://pdos.csail.mit.edu/6.824/index.html" target="_blank">MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag <a href="/tags/distributed-system/">Distributed System</a>. In this post, we are to build a fault tolerant key-value services on top of <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank">Raft</a>.</p>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true, theme: "neutral" });</script>
-<h2 id="overview">Overview</h2>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/6.824_lab3a/>KV Raft - 6.824 Lab3A</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1284 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/distributed-system>Distributed System</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p>This post is about part A of Lab3 of <a href=https://pdos.csail.mit.edu/6.824/index.html target=_blank>MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag <a href=/tags/distributed-system/>Distributed System</a>. In this post, we are to build a fault tolerant key-value services on top of <a href=https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf target=_blank>Raft</a>.</p>
+<script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script>
+<script>mermaid.initialize({startOnLoad:!0,theme:"neutral"})</script>
+<h2 id=overview>Overview</h2>
 <p>The functions we need to achieve are in fact very simple. It will need three functions:</p>
 <ol>
 <li><code>Put(key, value)</code>: Create a new key-value pair. Replace with the <code>vlaue</code> if the keys exists in the map;</li>
@@ -128,15 +62,15 @@
 <li><code>Get(key)</code>: Return the value if <code>key</code> exists in the map. Otherwise, return an empty string.</li>
 </ol>
 <p>If it&rsquo;s a singe server app, it won&rsquo;t take much time to implement. However, for fault tolerance, we will have to maintain multiple kv servers so that the service is available. Thus the real problem now is how to coordinate and synchronize the data between the servers through Raft.</p>
-<p><img class="img-zoomable" src="/imgs/kvraft/kvraft.png" alt="kvraft" />
+<p><img class=img-zoomable src=/imgs/kvraft/kvraft.png alt=kvraft>
 </p>
 <p>As diagram illustrated above, we will have a server cluster, where raft service can see each other to do the election and log replications but the kv server can only communicate with its only Raft service in the cluster. Clients will randomly send requests to any kv servers. However, only the kv server whose raft is the leader will proceed the request and send back the data. All other kv servers will reject the request and ask the client to try other kv server.</p>
-<h2 id="client-side">Client Side</h2>
+<h2 id=client-side>Client Side</h2>
 <p>Let us begin with something easy first. The job of client is very simple, sending requests to one kv server, waiting for response. If timeout or receive any error, retry with other kv server.</p>
 <p>As we will have multiple clients running parallelly, to make sure it&rsquo;s able to know which client sent the request. We will assign each client an ID generated by <code>nrand()</code>. And there is also a chance that the same request might be sent multiple times. To identify the duplicate requests, each request should have an ID generated by <code>nrand()</code>, so that kv server is able to recognize the duplicate requests.</p>
 <p>Besides, to speed up the later requests, the client can cache the last seen leader ID (which is basically the index of server in <code>ck.servers</code>), so it doesn&rsquo;t have to try from the first server.</p>
 <p>Thus we can define the client as below:</p>
-<pre><code class="language-go">type Clerk struct {
+<pre><code class=language-go>type Clerk struct {
 	servers   []*labrpc.ClientEnd
 	serverNum int
     
@@ -146,7 +80,7 @@
 }
 </code></pre>
 <p>When clients need to send the <code>Get</code> or <code>PutAppend</code> request, we can have <code>Get</code> defined like below as an example:</p>
-<pre><code class="language-go">// common.go
+<pre><code class=language-go>// common.go
 type GetArgs struct {
 	MsgId    int64
 	ClientId int64
@@ -172,36 +106,36 @@ func (ck *Clerk) Get(key string) string {
     // If timeout or error wrong leader, try anoterh server
 }
 </code></pre>
-<h2 id="server-side">Server Side</h2>
+<h2 id=server-side>Server Side</h2>
 <p>In the entire server cluster, only the server with the leader of Raft services can procced the requests from clients and send back the actual data to client. All other servers acts as back-up, only proceeding the request sent from the channel <code>kv.applyCh</code> and rejecting immediately any requests if finding itself not a leader in Raft services after calling <code>rf.Start()</code></p>
 <p>Those we can illustrate the logic of the cluster as below:</p>
-<div class="mermaid">
+<div class=mermaid>
 graph TB
-	client
-	subgraph cluster
-		kv1[KV Leader]
-        kv2[KV Follower 1]
-        kv3[KV Follower 2]
-        rf_l(["Raft Leader"])
-        rf_1(["Raft Follower 1"])
-        rf_2(["Raft Follower 2"])
-	end
-    client --> | a1. New request| kv1
-    kv1  --> |a2. Ask to log the requst| rf_l
-    rf_l --> |a3. Append the new log| rf_1 & rf_2
+client
+subgraph cluster
+kv1[KV Leader]
+kv2[KV Follower 1]
+kv3[KV Follower 2]
+rf_l(["Raft Leader"])
+rf_1(["Raft Follower 1"])
+rf_2(["Raft Follower 2"])
+end
+client --> | a1. New request| kv1
+kv1 --> |a2. Ask to log the requst| rf_l
+rf_l --> |a3. Append the new log| rf_1 & rf_2
 	rf_l --> |a4. complete the request from apply | kv1
-	rf_1 --> |a5. Send backed up load to its kv server | kv2
-	rf_2 --> |"as (a5)"| kv3
-	kv1  --> |"a6. Success (with data return)"| client
-	client -. b1. New request .-> kv2
-	kv2 -. b2. Falied due to not leader .-> client
+rf_1 --> |a5. Send backed up load to its kv server | kv2
+rf_2 --> |"as (a5)"| kv3
+kv1 --> |"a6. Success (with data return)"| client
+client -. b1. New request .-> kv2
+kv2 -. b2. Falied due to not leader .-> client
 </div>
 <blockquote>
 <p>In section <em>a</em>, the request is sent to leader and got proceeded in the all the nodes in the cluster but in section <em>b</em>, the request is rejected as <code>KV Follower 1</code> is not the leader in the cluster.</p>
 </blockquote>
 <p>Besides, another requirement is that duplicate requests must be omitted. Thus for each client, we need to cache the last request id it made.</p>
 <p>Thus we can have the struct <code>KVServer</code> defined as:</p>
-<pre><code class="language-go">type KVServer struct {
+<pre><code class=language-go>type KVServer struct {
 	mu   sync.Mutex
 	me   int
 	dead int32 // set by Kill()
@@ -223,11 +157,11 @@ graph TB
 	lastApplies map[int64]int64
 }
 </code></pre>
-<h3 id="leader-proceeding-the-requests">Leader Proceeding the Requests</h3>
-<p>All the operation won&rsquo;t be applied to <code>kv.data</code> directly after receiving the request. Leader <code>KVServer</code> will first submit the request to Raft by <code>rf.Start()</code> and make a wait channel in  <code>kv.waitChs</code> for this new request, for channel we need a timer to ensure that the goroutine <code>Get()</code> and <code>PutAppend()</code> will stop if taking too long to execute the request and can know the result of the execution without requiring additional lock for reading/updating the data. All the <code>KVServer</code> will execute the operation until they got the committed log sent back by Raft through <code>kv.applyCh</code> and send the execution result through <code>kv.waitChs</code> the goroutine <code>Get()</code> and <code>PutAppend()</code>.</p>
+<h3 id=leader-proceeding-the-requests>Leader Proceeding the Requests</h3>
+<p>All the operation won&rsquo;t be applied to <code>kv.data</code> directly after receiving the request. Leader <code>KVServer</code> will first submit the request to Raft by <code>rf.Start()</code> and make a wait channel in <code>kv.waitChs</code> for this new request, for channel we need a timer to ensure that the goroutine <code>Get()</code> and <code>PutAppend()</code> will stop if taking too long to execute the request and can know the result of the execution without requiring additional lock for reading/updating the data. All the <code>KVServer</code> will execute the operation until they got the committed log sent back by Raft through <code>kv.applyCh</code> and send the execution result through <code>kv.waitChs</code> the goroutine <code>Get()</code> and <code>PutAppend()</code>.</p>
 <p>You also need to define a new struct or add some new fields to <code>ApplyMsg</code> , so that <code>KVServer</code> can know request client id, request message id and other data help you identify duplications.</p>
 <p>Then we can have:</p>
-<pre><code class="language-go">func (kv *KVServer) start(args applyArg) (rep ApplyReply) {
+<pre><code class=language-go>func (kv *KVServer) start(args applyArg) (rep ApplyReply) {
 	index, term, isLeader := kv.rf.Start(args)
 	
     // Reject if not leader
@@ -274,255 +208,190 @@ func (kv *KVServer) waitApplyChan() {
 	}
 }
 </code></pre>
-<h3 id="changes-in-raft">Changes in Raft</h3>
+<h3 id=changes-in-raft>Changes in Raft</h3>
 <p>A very important thing to remember in this Lab3A is that <code>KVServer</code> will lose all the data once it dies. The way to recover to the previous state are two:</p>
 <ul>
 <li>Raft replays all the committed logs it has from 0 to <code>rf.commitIndex</code>;</li>
 <li>Use RPC <code>InstallSnapshot</code>, which we are to implement in the next lab.</li>
 </ul>
-<p>Thus the easiest solution for recovering the data of <code>kv</code> is that <code>rf.lastApplied</code> will be reset to 0 once rebooting, which indicates that <code>kv</code> has no data at all. So once Raft needs to send new <code>ApplyMsg</code> to <code>kv</code>, we should send <code>rf.log[rf.lastApplied+1:newCommitIndex+1]</code> and mark all the logs whose index 
+<p>Thus the easiest solution for recovering the data of <code>kv</code> is that <code>rf.lastApplied</code> will be reset to 0 once rebooting, which indicates that <code>kv</code> has no data at all. So once Raft needs to send new <code>ApplyMsg</code> to <code>kv</code>, we should send <code>rf.log[rf.lastApplied+1:newCommitIndex+1]</code> and mark all the logs whose index
 \(\leq\)
- <code>oldCommitIndex</code> invalid data as tester has seen these logs already.</p>
-    </div>
-</article>
-
-
-<div class="license markdown-body">
-    <blockquote>
-        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-               target="_blank">CC BY-NC-SA 4.0</a>.</p>
-    </blockquote>
+<code>oldCommitIndex</code> invalid data as tester has seen these logs already.</p>
 </div>
-
-
-
-            </div>
-            <aside class="col-12 col-md-3 float-left sidebar">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3><nav id="TableOfContents">
-  <ul>
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#client-side">Client Side</a></li>
-    <li><a href="#server-side">Server Side</a>
-      <ul>
-        <li><a href="#leader-proceeding-the-requests">Leader Proceeding the Requests</a></li>
-        <li><a href="#changes-in-raft">Changes in Raft</a></li>
-      </ul>
-    </li>
-  </ul>
+</article>
+<div class="license markdown-body">
+<blockquote>
+<p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p>
+</blockquote>
+</div>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3><nav id=TableOfContents>
+<ul>
+<li><a href=#overview>Overview</a></li>
+<li><a href=#client-side>Client Side</a></li>
+<li><a href=#server-side>Server Side</a>
+<ul>
+<li><a href=#leader-proceeding-the-requests>Leader Proceeding the Requests</a></li>
+<li><a href=#changes-in-raft>Changes in Raft</a></li>
+</ul>
+</li>
+</ul>
 </nav></div>
 </aside>
-        </div>
-        <div class="btn">
-    <div class="btn-menu" id="btn-menu">
-        <i class="iconfont icon-grid-sharp"></i>
-    </div>
-    <div class="btn-toggle-mode">
-        <i class="iconfont icon-contrast-sharp"></i>
-    </div>
-    <div class="btn-scroll-top">
-        <i class="iconfont icon-chevron-up-circle-sharp"></i>
-    </div>
 </div>
-<aside class="sidebar-mobile" style="display: none;">
-  <div class="sidebar-wrapper">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    
-    
-    
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3>
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#client-side">Client Side</a></li>
-    <li><a href="#server-side">Server Side</a>
-      <ul>
-        <li><a href="#leader-proceeding-the-requests">Leader Proceeding the Requests</a></li>
-        <li><a href="#changes-in-raft">Changes in Raft</a></li>
-      </ul>
-    </li>
-  </ul>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#overview>Overview</a></li>
+<li><a href=#client-side>Client Side</a></li>
+<li><a href=#server-side>Server Side</a>
+<ul>
+<li><a href=#leader-proceeding-the-requests>Leader Proceeding the Requests</a></li>
+<li><a href=#changes-in-raft>Changes in Raft</a></li>
+</ul>
+</li>
+</ul>
 </nav>
-    </div>
-    
-    
-  </div>
+</div>
+</div>
 </aside>
-    </main>
-
-    <footer>
-    <div class="container-lg clearfix">
-        <div class="col-12 footer">
-            
-            <span>&copy; 2019-2022
-                <a href="https://lianglouise.github.io/">Roy Liang</a>
-                 | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
-                | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
-                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
-                                                    target="_blank">Hugo</a> 
-            </span>
-        </div>
-    </div>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2023
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
 </footer>
-
-    
-<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
-
-
-<script defer src="/assets/js/fuji.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body);"
-></script>
-
-
-
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
 </body>
-
 </html>

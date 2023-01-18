@@ -1,124 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html><html lang=en>
 <head>
-    
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="HandheldFriendly" content="True" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-<meta name="generator" content="Hugo 0.96.0" />
-
-
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-<link rel="manifest" href="/favicon/site.webmanifest">
-<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="shortcut icon" href="/favicon/favicon.ico">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-config" content="/favicon/browserconfig.xml">
-<meta name="theme-color" content="#ffffff">
-
-
-<title>Some Practice on Implementing Signal Protocol With Python (1): X3DH - Roy&#39;s Repo</title>
-
-
-<meta name="author" content="Roy Liang" />
-
-
-<meta name="description" content="The Blog of Roy Liang" />
-
-
-<meta name="keywords" content="web, security" />
-
-
-<meta property="og:title" content="Some Practice on Implementing Signal Protocol With Python (1): X3DH" />
-<meta name="twitter:title" content="Some Practice on Implementing Signal Protocol With Python (1): X3DH" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/" /><meta property="og:description" content="Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - Signal Protocol." />
-<meta name="twitter:description" content="Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - Signal Protocol." /><meta name="twitter:card" content="summary" /><meta property="article:published_time" content="2020-10-20T18:27:11-04:00" /><meta property="article:modified_time" content="2020-10-20T18:27:11-04:00" />
-
-
-<style>
-    @media (prefers-color-scheme: dark) {
-        body[data-theme='auto'] img {
-            filter: brightness(60%);
-        }
-    }
-
-    body[data-theme='dark'] img {
-        filter: brightness(60%);
-    }
-</style>
-
-
-
-<link rel="stylesheet" href="https://lianglouise.github.io/assets/css/fuji.min.css" />
-
-
-
-
-
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'G-BJCGN2DM5Q');
-</script>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>Some Practice on Implementing Signal Protocol With Python (1): X3DH - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="web,security">
+<meta property="og:title" content="Some Practice on Implementing Signal Protocol With Python (1): X3DH">
+<meta name=twitter:title content="Some Practice on Implementing Signal Protocol With Python (1): X3DH">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/"><meta property="og:description" content="Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - Signal Protocol.">
+<meta name=twitter:description content="Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - Signal Protocol."><meta name=twitter:card content="summary"><meta property="article:published_time" content="2020-10-20T18:27:11-04:00"><meta property="article:modified_time" content="2020-10-20T18:27:11-04:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
-
-
 </head>
-
-<body data-theme="auto">
-    <script data-cfasync="false">
-  
-  var fujiThemeData = localStorage.getItem('fuji_data-theme');
-  
-  if (!fujiThemeData) {
-    localStorage.setItem('fuji_data-theme', 'auto');
-  } else {
-    
-    if (fujiThemeData !== 'auto') {
-      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
-    }
-  }
-</script>
-    <header>
-    <div class="container-lg clearfix">
-        <div class="col-12 header">
-            <a class="title-main" href="https://lianglouise.github.io/">Roy&#39;s Repo</a>
-            
-            <span class="title-sub">Share some thoughts</span>
-            
-        </div>
-    </div>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
 </header>
-
-    <main>
-        <div class="container-lg clearfix">
-            
-            <div class="col-12 col-md-9 float-left content">
-                
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
 <article>
-    
-    <h2 class="post-item post-title">
-        <a href="https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/">Some Practice on Implementing Signal Protocol With Python (1): X3DH</a>
-    </h2>
-    <div class="post-item post-meta">
-        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-10-20</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1636 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/web">web</a>&nbsp;<a href="/tags/security">security</a>&nbsp;</span>
-
-    </div>
-    
-    <div class="post-content markdown-body">
-        <p>Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - <a href="https://signal.org/docs/" target="_blank">Signal Protocol</a>.</p>
-<p>When doing web communication encryption, the most common solution is using TLS, where basically, two sides handshake using <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange" target="_blank">Diffie–Hellman key exchange</a> through an insecure channel and communicate using symmetric encryption (i.e.: AES) based on the secret key <code>SK</code> derivated from DH key exchange. This solution can provide strong enough encryption when communicating between client and server.</p>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/>Some Practice on Implementing Signal Protocol With Python (1): X3DH</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-10-20</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1636 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/web>web</a>&nbsp;<a href=/tags/security>security</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p>Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - <a href=https://signal.org/docs/ target=_blank>Signal Protocol</a>.</p>
+<p>When doing web communication encryption, the most common solution is using TLS, where basically, two sides handshake using <a href=https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange target=_blank>Diffie–Hellman key exchange</a> through an insecure channel and communicate using symmetric encryption (i.e.: AES) based on the secret key <code>SK</code> derivated from DH key exchange. This solution can provide strong enough encryption when communicating between client and server.</p>
 <p>However, when it comes to the situation where client talks to client (E2E) and server just redirects message, especially instant messaging, there are two major security issues we need to solve:</p>
 <ol>
 <li>
@@ -131,19 +65,19 @@
 <p>To achieve secure E2E communications, the signal protocol was thus introduced. It has two main fragments:</p>
 <ul>
 <li>
-<p><a href="https://signal.org/docs/specifications/x3dh/" target="_blank">Extended Triple Diffie-Hellman</a>(X3DH): This extended DH key exchange helps two clients establish a shared <code>SK</code> for future communications in an asynchronous way, only requiring two clients publish some keys to server;</p>
+<p><a href=https://signal.org/docs/specifications/x3dh/ target=_blank>Extended Triple Diffie-Hellman</a>(X3DH): This extended DH key exchange helps two clients establish a shared <code>SK</code> for future communications in an asynchronous way, only requiring two clients publish some keys to server;</p>
 </li>
 <li>
-<p><a href="https://signal.org/docs/specifications/doubleratchet/" target="_blank">Double Ratchet algorithm</a>: This algorithm provides both forward secrecy and break-in recovery, which makes each message have different <code>SK</code> so there is no way to crack one <code>SK</code> and know everything.</p>
+<p><a href=https://signal.org/docs/specifications/doubleratchet/ target=_blank>Double Ratchet algorithm</a>: This algorithm provides both forward secrecy and break-in recovery, which makes each message have different <code>SK</code> so there is no way to crack one <code>SK</code> and know everything.</p>
 </li>
 </ul>
 <p>The specifications from Signal Protocol provide a relatively high level overview but there are still some details not that clear and hard to understand. So I would like to talk about how I understand this protocol with some actual implementation in Python. In this post, I will focus on the X3DH part.</p>
-<h2 id="x3dh-protocol">X3DH Protocol</h2>
-<p>How shared DH Value computed in X3DH is using <a href="https://en.wikipedia.org/wiki/Curve25519" target="_blank">X25519 Key exchange</a> which is a <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman" target="_blank">Elliptic-curve Diffie–Hellman</a>. And I chose library <a href="https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/" target="_blank">cryptography</a>, which is part of <code>pyOpenSSL</code>, to compute this X25519 Key exchange.</p>
+<h2 id=x3dh-protocol>X3DH Protocol</h2>
+<p>How shared DH Value computed in X3DH is using <a href=https://en.wikipedia.org/wiki/Curve25519 target=_blank>X25519 Key exchange</a> which is a <a href=https://en.wikipedia.org/wiki/Elliptic-curve_Diffie%E2%80%93Hellman target=_blank>Elliptic-curve Diffie–Hellman</a>. And I chose library <a href=https://cryptography.io/en/latest/hazmat/primitives/asymmetric/x25519/ target=_blank>cryptography</a>, which is part of <code>pyOpenSSL</code>, to compute this X25519 Key exchange.</p>
 <p>The basic workflow of establishing a session using X3DH is illustrated as below:</p>
-<p><img class="img-zoomable" src="/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH.png" alt="X3DH.png" />
+<p><img class=img-zoomable src=/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH.png alt=X3DH.png>
 </p>
-<h3 id="preparation">Preparation</h3>
+<h3 id=preparation>Preparation</h3>
 <p>At first, both clients need to generate required key pairs, publish key bundles to server and save the secrets so they are able to start the session.</p>
 <p>Key pairs to generate:</p>
 <ol>
@@ -158,7 +92,7 @@
 </li>
 </ol>
 <p>Then all these key pair&rsquo;s public keys and <code>SPK_sig</code> will be sent to server.</p>
-<pre><code class="language-python">from cryptography.hazmat.primitives.asymmetric import x25519
+<pre><code class=language-python>from cryptography.hazmat.primitives.asymmetric import x25519
 from XEdDSA import sign
 
 class User():
@@ -189,13 +123,13 @@ class User():
                   'OPKs_p': self.OPKs_p
               }
 </code></pre>
-<p>Due to unable to find out how to do <a href="https://signal.org/docs/specifications/xeddsa/" target="_blank">XEdDSA</a> signature required by signal protocol while using <code>cryptography</code>, since each library has their different way to format their X25519 Keys, here I picked a mock function <code>sign</code>. You could refer to this <a href="https://blog.filippo.io/using-ed25519-keys-for-encryption/" target="_blank">blog post</a> and <a href="https://tools.ietf.org/html/rfc8032#section-5.1.5" target="_blank">RFC Standard</a> to convert between Ed25519 and X25519</p>
-<h3 id="establish-the-session">Establish the Session</h3>
+<p>Due to unable to find out how to do <a href=https://signal.org/docs/specifications/xeddsa/ target=_blank>XEdDSA</a> signature required by signal protocol while using <code>cryptography</code>, since each library has their different way to format their X25519 Keys, here I picked a mock function <code>sign</code>. You could refer to this <a href=https://blog.filippo.io/using-ed25519-keys-for-encryption/ target=_blank>blog post</a> and <a href=https://tools.ietf.org/html/rfc8032#section-5.1.5 target=_blank>RFC Standard</a> to convert between Ed25519 and X25519</p>
+<h3 id=establish-the-session>Establish the Session</h3>
 <p>To actually establish the session, steps 3-5 in the diagram above will be carried out by Alice and Bob.</p>
 <ul>
 <li>First, Alice tries to send first message. Her client will ask server for Bob&rsquo;s key bundle and generate a Ephemeral Key pair use only for this handshake:</li>
 </ul>
-<pre><code class="language-python"># Continue in Class Client
+<pre><code class=language-python># Continue in Class Client
 
   # Get key bundle from a server object
   def get_key_bundle(self, server, user_name):
@@ -234,10 +168,10 @@ class User():
 <p><code>OPK_pb</code> Bob&rsquo;s public One-time Off key</p>
 </li>
 </ul>
-<p><img class="img-zoomable" src="/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH_Key_exchange.png" alt="X3DH_Key_exchange.png" />
+<p><img class=img-zoomable src=/imgs/Some_Practice_on_Implementing_Signal_Protocol_With_Python/X3DH_Key_exchange.png alt=X3DH_Key_exchange.png>
 </p>
 <p>getting 4 <code>DH</code> values and derivate a 32 bytes <code>SK</code>, where <code>SK = HKDF(DH_1||DH_2||DH_3||DH_4)</code></p>
-<pre><code class="language-python">from Crypto.Protocol.KDF import HKDF
+<pre><code class=language-python>from Crypto.Protocol.KDF import HKDF
 from Crypto.Hash import SHA256
 from XEdDSA import verify
 
@@ -267,21 +201,21 @@ KDF_SALT = b'\0' * KDF_LEN
     key_bundle['SK'] = x3dh_KDF(DH_1 + DH_2 + DH_3 + DH_4)
 
 </code></pre>
-<p>The <code>HKDF</code> here I pick is from <a href="https://pycryptodome.readthedocs.io/en/latest/src/protocol/kdf.html#hkdf" target="_blank">pycryptodome</a>. And note that X3DH requires <code>HKDF</code> function prepend 32 <code>b'\xff'</code> bytes if curve is X25519, and 57 <code>b'\xff'</code> bytes if curve is X448. The salt should a <code>b'\0'</code> byte sequence of length equals to length of output key length. Hash functions are required to be a 256-bit or 512-bit function.</p>
+<p>The <code>HKDF</code> here I pick is from <a href=https://pycryptodome.readthedocs.io/en/latest/src/protocol/kdf.html#hkdf target=_blank>pycryptodome</a>. And note that X3DH requires <code>HKDF</code> function prepend 32 <code>b'\xff'</code> bytes if curve is X25519, and 57 <code>b'\xff'</code> bytes if curve is X448. The salt should a <code>b'\0'</code> byte sequence of length equals to length of output key length. Hash functions are required to be a 256-bit or 512-bit function.</p>
 </li>
 <li>
 <p>Then, Alice&rsquo;s client will build the hello message to send out:</p>
 <p>The format of the initial message:</p>
 <p><code>IK_pb||EK_pa||OPK_pb||n_0||t_0||AES(SK, SIG(IK_sa, IK_pa||EK_pa||OPK_pb||AD)||IK_pa||IK_pb||AD)</code></p>
 <p>and you could set the <code>AD</code>&rsquo;s format like this:</p>
-<pre><code class="language-json">{
+<pre><code class=language-json>{
   &quot;from&quot;: &quot;alice&quot;,
   &quot;to&quot;: &quot;bob&quot;,
   &quot;message&quot;: &quot;&lt;some greeting messages&gt;&quot;
 }
 </code></pre>
 <p>Implement in Python:</p>
-<pre><code class="language-python">from cryptography.hazmat.primitives import serialization
+<pre><code class=language-python>from cryptography.hazmat.primitives import serialization
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 import json
@@ -335,7 +269,7 @@ AES_TAG_LEN =16
     # For Double Ratchet
     self.initialize_dr_state(to, key_bundle['SK'], [key_bundle['EK_s'], key_bundle['EK_p']], &quot;&quot;)
 </code></pre>
-<p><code>AES</code> refers <code>AES256</code> in GCM Mode, <code>n_0</code> and <code>t_0</code> are nonce and tag, using <code>SK</code> as key, which is also from <a href="https://pycryptodome.readthedocs.io/en/latest/src/cipher/aes.html" target="_blank">pycryptodome</a>.</p>
+<p><code>AES</code> refers <code>AES256</code> in GCM Mode, <code>n_0</code> and <code>t_0</code> are nonce and tag, using <code>SK</code> as key, which is also from <a href=https://pycryptodome.readthedocs.io/en/latest/src/cipher/aes.html target=_blank>pycryptodome</a>.</p>
 </li>
 <li>
 <p>Finally, Bob receives first message, decrypts and verifies it:</p>
@@ -355,7 +289,7 @@ AES_TAG_LEN =16
 <p>verify <code>AD</code>, the json object in the hello message has correct from and to.</p>
 </li>
 </ul>
-<pre><code class="language-python">EC_KEY_LEN = 32
+<pre><code class=language-python>EC_KEY_LEN = 32
 
   # Continue in Class Client
   def recv_x3dh_hello_message(self, server):
@@ -448,250 +382,185 @@ AES_TAG_LEN =16
 </code></pre>
 </li>
 </ul>
-<h2 id="next-step">Next Step</h2>
+<h2 id=next-step>Next Step</h2>
 <p>After both Alice and Bob share a <code>SK</code>, X3DH can be marked as completed. Though this process is hard to be cracked out, we have to integrate it with Double Ratchet Algorithm to reach ultimate secure in application layer (Again, this only encrypts the request/response data but not IP/TCP or others). And I will talk about it in the next part.</p>
 <p>For now, we just need to make sure what to keep for DR integration and what to destroy to avoid reuse attack.</p>
 <p>Alice, Bob and server need to destroy the <code>OPK</code> from Bob used in this handshake.</p>
 <p>Alice needs to keep <code>EK</code> pair and <code>SK</code> to initiate DR.</p>
 <p>Bob also needs to keep Alice&rsquo;s <code>EK_p</code> and <code>SK</code> to initiate DR and send his response using DR.</p>
-    </div>
-</article>
-
-
-<div class="license markdown-body">
-    <blockquote>
-        <p>Unless otherwise noted, the content of this site is licensed under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
-               target="_blank">CC BY-NC-SA 4.0</a>.</p>
-    </blockquote>
 </div>
-
-
-
-            </div>
-            <aside class="col-12 col-md-3 float-left sidebar">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3><nav id="TableOfContents">
-  <ul>
-    <li><a href="#x3dh-protocol">X3DH Protocol</a>
-      <ul>
-        <li><a href="#preparation">Preparation</a></li>
-        <li><a href="#establish-the-session">Establish the Session</a></li>
-      </ul>
-    </li>
-    <li><a href="#next-step">Next Step</a></li>
-  </ul>
+</article>
+<div class="license markdown-body">
+<blockquote>
+<p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p>
+</blockquote>
+</div>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3><nav id=TableOfContents>
+<ul>
+<li><a href=#x3dh-protocol>X3DH Protocol</a>
+<ul>
+<li><a href=#preparation>Preparation</a></li>
+<li><a href=#establish-the-session>Establish the Session</a></li>
+</ul>
+</li>
+<li><a href=#next-step>Next Step</a></li>
+</ul>
 </nav></div>
 </aside>
-        </div>
-        <div class="btn">
-    <div class="btn-menu" id="btn-menu">
-        <i class="iconfont icon-grid-sharp"></i>
-    </div>
-    <div class="btn-toggle-mode">
-        <i class="iconfont icon-contrast-sharp"></i>
-    </div>
-    <div class="btn-scroll-top">
-        <i class="iconfont icon-chevron-up-circle-sharp"></i>
-    </div>
 </div>
-<aside class="sidebar-mobile" style="display: none;">
-  <div class="sidebar-wrapper">
-    
-    <div class="sidebar-item sidebar-pages">
-        <h3>Pages</h3>
-        <ul>
-            
-            <li>
-                <a href="/">Home</a>
-            </li>
-            
-            <li>
-                <a href="/archives/">Archives</a>
-            </li>
-            
-            <li>
-                <a href="/about/">About</a>
-            </li>
-            
-            <li>
-                <a href="/gpg_email/">Email</a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-links">
-        <h3>Links</h3>
-        <ul>
-            
-            <li>
-                <a href="https://github.com/lianglouise" target="_blank"><span>GitHub</span></a>
-            </li>
-            
-            <li>
-                <a href="https://www.linkedin.com/in/jiasong-liang" target="_blank"><span>Linkedin</span></a>
-            </li>
-            
-        </ul>
-    </div>
-    
-    <div class="sidebar-item sidebar-tags">
-        <h3>Tags</h3>
-        <div>
-            
-            <span>
-                <a href="/tags/data-structure/">data structure</a>
-            </span>
-            
-            <span>
-                <a href="/tags/distributed-system/">Distributed System</a>
-            </span>
-            
-            <span>
-                <a href="/tags/intro/">Intro</a>
-            </span>
-            
-            <span>
-                <a href="/tags/linux-kernel/">linux kernel</a>
-            </span>
-            
-            <span>
-                <a href="/tags/security/">security</a>
-            </span>
-            
-            <span>
-                <a href="/tags/web/">web</a>
-            </span>
-            
-        </div>
-    </div>
-    
-    
-    
-    <div class="sidebar-item sidebar-toc">
-        <h3>TOC</h3>
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#x3dh-protocol">X3DH Protocol</a>
-      <ul>
-        <li><a href="#preparation">Preparation</a></li>
-        <li><a href="#establish-the-session">Establish the Session</a></li>
-      </ul>
-    </li>
-    <li><a href="#next-step">Next Step</a></li>
-  </ul>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#x3dh-protocol>X3DH Protocol</a>
+<ul>
+<li><a href=#preparation>Preparation</a></li>
+<li><a href=#establish-the-session>Establish the Session</a></li>
+</ul>
+</li>
+<li><a href=#next-step>Next Step</a></li>
+</ul>
 </nav>
-    </div>
-    
-    
-  </div>
+</div>
+</div>
 </aside>
-    </main>
-
-    <footer>
-    <div class="container-lg clearfix">
-        <div class="col-12 footer">
-            
-            <span>&copy; 2019-2022
-                <a href="https://lianglouise.github.io/">Roy Liang</a>
-                 | <a href="https://github.com/LiangLouise/lianglouise.github.io">Source code</a> 
-                | Powered by <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
-                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
-                                                    target="_blank">Hugo</a> 
-            </span>
-        </div>
-    </div>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2023
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
 </footer>
-
-    
-<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
-
-
-<script defer src="/assets/js/fuji.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
-<script
-  defer
-  src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body);"
-></script>
-
-
-
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
 </body>
-
 </html>

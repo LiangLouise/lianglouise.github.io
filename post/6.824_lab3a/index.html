@@ -48,7 +48,7 @@
 <a href=https://lianglouise.github.io/post/6.824_lab3a/>KV Raft - 6.824 Lab3A</a>
 </h2>
 <div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1284 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/distributed-system>Distributed System</a>&nbsp;</span>
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-02-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1288 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/distributed-system>Distributed System</a>&nbsp;</span>
 </div>
 <div class="post-content markdown-body">
 <p>This post is about part A of Lab3 of <a href=https://pdos.csail.mit.edu/6.824/index.html target=_blank>MIT 6.824</a>, Distributed Systems. For previous two parts, please refer to the posts about the Lab 1 and 2 under the tag <a href=/tags/distributed-system/>Distributed System</a>. In this post, we are to build a fault tolerant key-value services on top of <a href=https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf target=_blank>Raft</a>.</p>
@@ -109,27 +109,30 @@ func (ck *Clerk) Get(key string) string {
 <h2 id=server-side>Server Side</h2>
 <p>In the entire server cluster, only the server with the leader of Raft services can procced the requests from clients and send back the actual data to client. All other servers acts as back-up, only proceeding the request sent from the channel <code>kv.applyCh</code> and rejecting immediately any requests if finding itself not a leader in Raft services after calling <code>rf.Start()</code></p>
 <p>Those we can illustrate the logic of the cluster as below:</p>
-<div class=mermaid>
+<pre class=mermaid>
 graph TB
-client
-subgraph cluster
-kv1[KV Leader]
-kv2[KV Follower 1]
-kv3[KV Follower 2]
-rf_l(["Raft Leader"])
-rf_1(["Raft Follower 1"])
-rf_2(["Raft Follower 2"])
-end
-client --> | a1. New request| kv1
-kv1 --> |a2. Ask to log the requst| rf_l
-rf_l --> |a3. Append the new log| rf_1 & rf_2
+	client
+	subgraph cluster
+		kv1[KV Leader]
+        kv2[KV Follower 1]
+        kv3[KV Follower 2]
+        rf_l(["Raft Leader"])
+        rf_1(["Raft Follower 1"])
+        rf_2(["Raft Follower 2"])
+	end
+    client --> | a1. New request| kv1
+    kv1  --> |a2. Ask to log the requst| rf_l
+    rf_l --> |a3. Append the new log| rf_1 & rf_2
 	rf_l --> |a4. complete the request from apply | kv1
-rf_1 --> |a5. Send backed up load to its kv server | kv2
-rf_2 --> |"as (a5)"| kv3
-kv1 --> |"a6. Success (with data return)"| client
-client -. b1. New request .-> kv2
-kv2 -. b2. Falied due to not leader .-> client
-</div>
+	rf_1 --> |a5. Send backed up load to its kv server | kv2
+	rf_2 --> |"as (a5)"| kv3
+	kv1  --> |"a6. Success (with data return)"| client
+	client -. b1. New request .-> kv2
+	kv2 -. b2. Falied due to not leader .-> client
+</pre>
+<script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+</script>
 <blockquote>
 <p>In section <em>a</em>, the request is sent to leader and got proceeded in the all the nodes in the cluster but in section <em>b</em>, the request is rejected as <code>KV Follower 1</code> is not the leader in the cluster.</p>
 </blockquote>

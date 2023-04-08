@@ -50,11 +50,13 @@ In HTTP/3, the way the sender&rsquo;s encoder and the receiver&rsquo;s decoder r
 <a href=https://lianglouise.github.io/post/qpack_guide/>QPACK Guide</a>
 </h2>
 <div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2023-03-28</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1074 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/http/3>HTTP/3</a>&nbsp;</span>
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2023-03-28</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1078 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/http/3>HTTP/3</a>&nbsp;</span>
 </div>
 <div class="post-content markdown-body">
 <p><a href=https://httpwg.org/specs/rfc9204.html target=_blank>QPACK</a> is a header field compression format for HTTP/3 that makes HTTP/2’s HPACK header compression format compatible with the <a href=https://datatracker.ietf.org/doc/rfc9000/ target=_blank>QUIC protocol</a>.</p>
 <p>In HTTP/3, the way the sender&rsquo;s encoder and the receiver&rsquo;s decoder reach agreement on the the state of the dynamic table for compression would be very different compared to HTTP/2. In this post, I would like to talk some of understanding I gained while I was reading the RFC and implementing QPACK.</p>
+<script src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script>
+<script>mermaid.initialize({startOnLoad:!0,theme:"neutral"})</script>
 <h2 id=why-different>Why Different?</h2>
 <p>HPACK doesn&rsquo;t need the endpoint to communicate directly with its peer for the most of time (unless there is a change in the dynamic table size). Since all HTTP/2 frames in different stream will always be transmitted in order when they are transmitted over TCP. So we don&rsquo;t need to worry if the decoder&rsquo;s dynamic table will somehow get into a state different from the encoder&rsquo;s at all.</p>
 <p>Nevertheless, due to the nature of QUIC, which only guarantees that data in the same stream would &ldquo;arrive in order&rdquo; at the application layer, QPACK requires the sender&rsquo;s encoder to start a HTTP/3 unidirectional stream <em>Encoder Stream</em> and the receiver&rsquo;s decoder to start a HTTP/3 unidirectional stream <em>Decoder Stream</em> to sync the states of the dynamic table at both sides.</p>
@@ -95,49 +97,50 @@ Once the receiver decides to reset the stream for the reasons other before prope
 </ul>
 <h2 id=a-typical-session>A Typical Session</h2>
 <p>To give a better and clearer idea how QPACK works between two endpoints, below is a sample sequence diagram. Since there are going to be two pairs of QPACK&rsquo;s encoder and decoder between client and server&rsquo;s HTTP/3 connection, here we focus on the client&rsquo;s encoder and the server&rsquo;s decoder, as the other pair will behave the same.</p>
-<pre><code class=language-mermaid>sequenceDiagram
-    box client
-    participant Client's encoder
-    participant Client
-    end
+<div class=mermaid>
+sequenceDiagram
+box client
+participant Client's encoder
+participant Client
+end
+<pre><code>box server    
+participant Server
+participant Server's decoder    
+end
 
-    box server    
-    participant Server
-    participant Server's decoder    
-    end
+Client-&gt;&gt;Server: Control Stream, Client's SETTINGS frame
 
-    Client-&gt;&gt;Server: Control Stream, Client's SETTINGS frame
-    
-    rect rgb(93, 173, 226)
-    Server-&gt;&gt;Client: Control Stream, Server's SETTINGS frame &lt;br/&gt;(contains Non-zero SETTINGS_QPACK_MAX_TABLE_CAPACITY)
+rect rgb(93, 173, 226)
+Server-&gt;&gt;Client: Control Stream, Server's SETTINGS frame &lt;br/&gt;(contains Non-zero SETTINGS_QPACK_MAX_TABLE_CAPACITY)
 
-    Client's encoder-&gt;&gt;Server's decoder: Starts Encoder Stream, and &lt;br/&gt; sends Set Dynamic Table Capacity instruction to enable dynamic table
-    Server's decoder-&gt;&gt;Client's encoder: Starts Decoder stream. (Server can also wait until &lt;br/&gt; there are entries inserted into the dynamic table then start this)
-    end
+Client's encoder-&gt;&gt;Server's decoder: Starts Encoder Stream, and &lt;br/&gt; sends Set Dynamic Table Capacity instruction to enable dynamic table
+Server's decoder-&gt;&gt;Client's encoder: Starts Decoder stream. (Server can also wait until &lt;br/&gt; there are entries inserted into the dynamic table then start this)
+end
 
-    Server--&gt;Client: The same actions happens between &lt;br/&gt; the client's decoder and server's encoder
+Server--&gt;Client: The same actions happens between &lt;br/&gt; the client's decoder and server's encoder
 
-    rect rgb(93, 173, 226)
-    Client--&gt;&gt;Server: Starts a request stream with an id of 4
-    Client-&gt;&gt;Client's encoder: encode the fields for &lt;br/&gt; the header fields in the request on stream 4
+rect rgb(93, 173, 226)
+Client--&gt;&gt;Server: Starts a request stream with an id of 4
+Client-&gt;&gt;Client's encoder: encode the fields for &lt;br/&gt; the header fields in the request on stream 4
 
-    Client's encoder-&gt;&gt;Client: Encodes the fields by inserting the fields into &lt;br/&gt; dynamic table and add references &lt;br/&gt; to  those entries for stream 4
-    Client's encoder-&gt;&gt;Server's decoder: Sends out Insert Instructions to update decoder's dynamic table
+Client's encoder-&gt;&gt;Client: Encodes the fields by inserting the fields into &lt;br/&gt; dynamic table and add references &lt;br/&gt; to  those entries for stream 4
+Client's encoder-&gt;&gt;Server's decoder: Sends out Insert Instructions to update decoder's dynamic table
 
-    par
-    Client--&gt;&gt;Server: Sends out the HTTP request on stream 4 &lt;br/&gt; with encoded HEADERS frame
-        Note right of Client: Client may use the entries &lt;br/&gt; before receiving the ack 
-    Server's decoder-&gt;&gt;Client's encoder: Sends out Insert Count Increment instruction to acknowledge its dynamic table update
-    end
+par
+Client--&gt;&gt;Server: Sends out the HTTP request on stream 4 &lt;br/&gt; with encoded HEADERS frame
+    Note right of Client: Client may use the entries &lt;br/&gt; before receiving the ack 
+Server's decoder-&gt;&gt;Client's encoder: Sends out Insert Count Increment instruction to acknowledge its dynamic table update
+end
 
-    Server-&gt;&gt;Server's decoder: Decodes the HEADERS &lt;br/&gt; frames on stream 4
-    Server's decoder-&gt;&gt;Client's encoder: Sends out Section Acknowledgment instruction &lt;br/&gt; after it decodes all fields in the received HEADER frame on stream 4
-    Client's encoder-&gt;&gt;Client's encoder: Clears the references &lt;br/&gt; associated with stream 4
+Server-&gt;&gt;Server's decoder: Decodes the HEADERS &lt;br/&gt; frames on stream 4
+Server's decoder-&gt;&gt;Client's encoder: Sends out Section Acknowledgment instruction &lt;br/&gt; after it decodes all fields in the received HEADER frame on stream 4
+Client's encoder-&gt;&gt;Client's encoder: Clears the references &lt;br/&gt; associated with stream 4
 
-    end
+end
 
-    Client--&gt;Server: Following client's requests on request streams &lt;br/&gt; of the same connection will repeat the processes above
+Client--&gt;Server: Following client's requests on request streams &lt;br/&gt; of the same connection will repeat the processes above
 </code></pre>
+</div>
 <h2 id=references>References</h2>
 <ul>
 <li><a href=https://httpwg.org/specs/rfc9114.html target=_blank>HTTP/3</a></li>

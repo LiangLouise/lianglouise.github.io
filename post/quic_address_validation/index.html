@@ -1,0 +1,291 @@
+<!doctype html><html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>QUIC Address Validation - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="QUIC">
+<meta property="og:title" content="QUIC Address Validation">
+<meta name=twitter:title content="QUIC Address Validation">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/quic_address_validation/"><meta property="og:description" content="QUIC is a new transport protocol meant to be the replacement of the TCP + TLS, which is on top of UDP. Other the security mechanisms provided by TLS, QUIC itself has offered an extension for an endpoint to do an identity verification to the remote endpoint, to prevent from traffic amplification attack. It&rsquo;s called address validation, and it would be done along side with initial handshakes between client and server. This post will briefly talked about how this is done within QUIC.">
+<meta name=twitter:description content="QUIC is a new transport protocol meant to be the replacement of the TCP + TLS, which is on top of UDP. Other the security mechanisms provided by TLS, QUIC itself has offered an extension for an endpoint to do an identity verification to the remote endpoint, to prevent from traffic amplification attack. It&rsquo;s called address validation, and it would be done along side with initial handshakes between client and server. This post will briefly talked about how this is done within QUIC."><meta name=twitter:card content="summary"><meta property="article:published_time" content="2024-02-07T22:42:56-08:00"><meta property="article:modified_time" content="2024-02-07T22:42:56-08:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
+</head>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
+</header>
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
+<article>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/quic_address_validation/>QUIC Address Validation</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2024-02-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;923 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/quic>QUIC</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p><a href=https://www.rfc-editor.org/info/rfc9000 target=_blank>QUIC</a> is a new transport protocol meant to be the replacement of the TCP + TLS, which is on top of UDP. Other the security mechanisms provided by TLS, QUIC itself has offered an extension for an endpoint to do an identity verification to the remote endpoint, to prevent from traffic amplification attack. It&rsquo;s called address validation, and it would be done along side with initial handshakes between client and server. This post will briefly talked about how this is done within QUIC.</p>
+<h2 id=address-validation>Address Validation</h2>
+<p>In short, address validation is mainly done by the field <code>Token</code> in the initial packet. The receiver (server) would require the sender (client) of the initial packet to set <code>Token</code> to the value the receiver previously generated.</p>
+<p>If the sender keeps using a token that the receiver cannot recognize, receiver need to close the connection stateless by sending a CONNECTION_CLOSE frame with the error code <code>INVALID_TOKEN (0x0b)</code> and ignore any subsequent requests.</p>
+<pre><code>Initial Packet {
+  Header Form (1) = 1,
+  Fixed Bit (1) = 1,
+  Long Packet Type (2) = 0,
+  Reserved Bits (2),
+  Packet Number Length (2),
+  Version (32),
+  Destination Connection ID Length (8),
+  Destination Connection ID (0..160),
+  Source Connection ID Length (8),
+  Source Connection ID (0..160),
+  Token Length (i),
+  Token (..),
+  Length (i),
+  Packet Number (8..32),
+  Packet Payload (8..),
+}
+</code></pre>
+<blockquote>
+<p>Initial Packet Layout <a href=https://www.rfc-editor.org/rfc/rfc9000.html#section-17.2.2 target=_blank>RFC 9000 Section 17.2.2</a></p>
+</blockquote>
+<p>This would bring us to the first question. Since the client is the always the endpoint that opens a new connection, how would it know what the <code>Token</code> value is the server wants if it has never reached to that server in the past? (Usually the client knows the server supports the QUIC&HTTP/3 by header field <code>alt-svc</code> in the server&rsquo;s response header, whose value would contain if HTTP/3 is available and on which port it is available.)</p>
+<h3 id=validation-by-retry-packet>Validation by Retry Packet</h3>
+<pre class=mermaid>
+sequenceDiagram
+    participant Client
+    participant Server
+
+    Client->>Server: Initial Packet (payload contains Client Hello)
+    Server->>Client: Retry Packet (contains new token)
+    Client->>Server: Initial Packet + Client Hello(with new token)
+    Server->>Client: Initial Packet (payload contains Server Hello)
+    Server->>Client: Do TLS handshake
+    Client-->Server: Start to exchange stream data
+
+</pre>
+<script type=module>
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+</script>
+<p>As shown in the sequence diagram above, upon receiving the client&rsquo;s first initial packet and successfully decoded the <code>Token</code> field in the packet header, server would compare the token value with its existing the valid token set. If no match, it would generate a new token and pass it to the client via. the Retry Packet&rsquo;s <code>Retry Token</code> field.</p>
+<pre><code>Retry Packet {
+  Header Form (1) = 1,
+  Fixed Bit (1) = 1,
+  Long Packet Type (2) = 3,
+  Unused (4),
+  Version (32),
+  Destination Connection ID Length (8),
+  Destination Connection ID (0..160),
+  Source Connection ID Length (8),
+  Source Connection ID (0..160),
+  Retry Token (..),
+  Retry Integrity Tag (128),
+}
+</code></pre>
+<blockquote>
+<p>Retry Packet Layout <a href=https://www.rfc-editor.org/rfc/rfc9000.html#figure-18 target=_blank>RFC 9000 Section 17.2.5</a></p>
+</blockquote>
+<p>A legitimate client would then resend its initial packets with the token value offered in the retry packet. Otherwise, server would turn down this connection.</p>
+<p>One important thing to note though is that RFC didn&rsquo;t explain if the token value generated during this stage is only valid for this connection or can be used in the future connections. However, it mentioned in the <a href=https://www.rfc-editor.org/rfc/rfc9000.html#section-8.1.3-2 target=_blank>subsequent section</a> that token in the retry packet is used immediately, and must not be carried over to the future connections.</p>
+<h3 id=for-future-connections>For Future Connections</h3>
+<p>To avoid this extra step of sending/receiving retry packets for connection establishment in the future, server is allowed to advertise the token values it wishes the client to use in the future to the client via. <code>NEW_TOKEN </code> frames.</p>
+<pre><code>NEW_TOKEN Frame {
+  Type (i) = 0x07,
+  Token Length (i),
+  Token (..),
+}
+</code></pre>
+<blockquote>
+<p>NEW_TOKEN Frames Layout <a href=https://www.rfc-editor.org/rfc/rfc9000.html#figure-31 target=_blank>RFC 9000 Section 17.2.5</a></p>
+</blockquote>
+<p>Multiple different token values can be sent to the client via. multiple <code>NEW_TOKEN </code> frame, client could use any of these in the future connection, however since each token in acquired from the <code>NEW_TOKEN </code> frame are likely to have an expiration time, it&rsquo;s recommend for the client to always use the latest one when starting the new connection.</p>
+<p>Server may need regularly retire old tokens and send to the clients with ones.</p>
+<h3 id=purpose-of-adding-this>Purpose of Adding This</h3>
+<p>In TCP, the TLS handshake won&rsquo;t happen until TCP handshake is done. So there is no way malicious actors could spoof the server with the victims' IP address, as the victim would only receive a TCP ACK for TCP handshake but no other DATA.</p>
+<p>While in the QUIC, TLS handshake is done alone with the QUIC ACK for initial packets from the server, after the server received an initial packet from the client. If there is no address validation, server would directly reply a much larger QUIC packet containing the Server Hello and the server&rsquo;s certificate to the spoofed IP address. The response would be even larger if the server has a relatively long chain of certificates. By doing so, the victim&rsquo;s machine would be flooded with these kind of unwanted big UDP packets. This is also called as traffic amplification attack.</p>
+<p>Now if the server enables the address validation, server then would reply with a much smaller retry packet. And if the victim won&rsquo;t reply with the new token, server don&rsquo;t have to send the TLS handshake back and just shuts down the connection.</p>
+<p>However, since the fact that the initial packet and retry packet would always be sent in the plaint text, if the malicious actor has the capability of eavesdropping the traffic from the server, it can simply use such token in its initial packet and server would send Server Hello this time.</p>
+</div>
+</article>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/http/3/>HTTP/3</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/quic/>QUIC</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+</aside>
+</div>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/http/3/>HTTP/3</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/quic/>QUIC</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2024
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
+</footer>
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
+</body>
+</html>

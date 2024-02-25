@@ -102,13 +102,13 @@ sequenceDiagram
     participant Client
     end
 
-    box server    
+    box server
     participant Server
-    participant Server's decoder    
+    participant Server's decoder
     end
 
     Client->>Server: Control Stream, Client's SETTINGS frame
-    
+
     rect rgb(93, 173, 226)
     Server->>Client: Control Stream, Server's SETTINGS frame <br>(contains Non-zero SETTINGS_QPACK_MAX_TABLE_CAPACITY)
 
@@ -199,6 +199,9 @@ sequenceDiagram
 <a href=/tags/linux-kernel/>linux kernel</a>
 </span>
 <span>
+<a href=/tags/quic/>QUIC</a>
+</span>
+<span>
 <a href=/tags/security/>security</a>
 </span>
 <span>
@@ -266,6 +269,9 @@ sequenceDiagram
 </span>
 <span>
 <a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/quic/>QUIC</a>
 </span>
 <span>
 <a href=/tags/security/>security</a>

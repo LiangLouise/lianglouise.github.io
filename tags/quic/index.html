@@ -16,16 +16,13 @@
 <meta name=msapplication-TileColor content="#da532c">
 <meta name=msapplication-config content="/favicon/browserconfig.xml">
 <meta name=theme-color content="#ffffff">
-<title>Meeting With Me - Roy's Repo</title>
+<title>QUIC - Roy's Repo</title>
 <meta name=author content="Roy Liang">
 <meta name=description content="The Blog of Roy Liang">
-<meta property="og:title" content="Meeting With Me">
-<meta name=twitter:title content="Meeting With Me">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://lianglouise.github.io/meeting/"><meta property="og:description" content="Please book your time below.
-  ">
-<meta name=twitter:description content="Please book your time below.
-  "><meta name=twitter:card content="summary"><meta property="article:published_time" content="2021-06-25T00:00:00+00:00"><meta property="article:modified_time" content="2021-06-25T00:00:00+00:00">
+<meta property="og:title" content="QUIC">
+<meta name=twitter:title content="QUIC">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lianglouise.github.io/tags/quic/"><meta name=twitter:card content="summary"><meta property="og:updated_time" content="2024-02-07T22:42:56-08:00">
 <style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
 <link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
@@ -44,19 +41,20 @@
 <main>
 <div class="container-lg clearfix">
 <div class="col-12 col-md-9 float-left content">
-<article>
+<div class=page-info>
+<span>Posts with the tag QUIC: </span>
+</div>
+<div class=post>
 <h2 class="post-item post-title">
-<a href=https://lianglouise.github.io/meeting/>Meeting With Me</a>
+<a href=https://lianglouise.github.io/post/quic_address_validation/>QUIC Address Validation</a>
 </h2>
 <div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-06-25</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;5 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;No tag</span>
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2024-02-07</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;923 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/quic>QUIC</a>&nbsp;</span>
 </div>
-<div class="post-content markdown-body">
-<p>Please book your time below.</p>
-<div class=calendly-inline-widget data-url="https://calendly.com/royliang?hide_gdpr_banner=1&background_color=fffffd&primary_color=8aa2d3" style=min-width:320px;height:800px></div>
-<script type=text/javascript src=https://assets.calendly.com/assets/external/widget.js async></script>
+<div class="post-item post-summary markdown-body">
+<p><a href=https://www.rfc-editor.org/info/rfc9000 target=_blank>QUIC</a> is a new transport protocol meant to be the replacement of the TCP + TLS, which is on top of UDP. Other the security mechanisms provided by TLS, QUIC itself has offered an extension for an endpoint to do an identity verification to the remote endpoint, to prevent from traffic amplification attack. It&rsquo;s called address validation, and it would be done along side with initial handshakes between client and server. This post will briefly talked about how this is done within QUIC.</p>
 </div>
-</article>
+</div>
 </div>
 <aside class="col-12 col-md-3 float-left sidebar">
 <div class="sidebar-item sidebar-pages">

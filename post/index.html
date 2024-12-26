@@ -22,7 +22,7 @@
 <meta property="og:title" content="Posts">
 <meta name=twitter:title content="Posts">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://lianglouise.github.io/post/"><meta name=twitter:card content="summary"><meta property="og:updated_time" content="2024-02-07T22:42:56-08:00">
+<meta property="og:url" content="https://lianglouise.github.io/post/"><meta name=twitter:card content="summary"><meta property="og:updated_time" content="2024-12-10T22:38:31-08:00">
 <style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
 <link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
@@ -41,6 +41,18 @@
 <main>
 <div class="container-lg clearfix">
 <div class="col-12 col-md-9 float-left content">
+<div class=post>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/extend_debian/>Extend the disk size of a Debian qcow2 </a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2024-12-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;489 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/linux>Linux</a>&nbsp;</span>
+</div>
+<div class="post-item post-summary markdown-body">
+Recently I am working on a project requiring me to pack some QEMU images for the CI purpose. As it&rsquo;s going be a VM which requires almost no changes after it&rsquo;s configured, I was hoping to minimize it as much as possible. The OS image I need to use is the Debian 12 image from the official Debian release repo.
+The softwares I installed required some disk space around 2G, which is more than the original disk space the image initially configured, so I decided to extend the disk to allocate more space directly as I really don&rsquo;t want to create an extra img file for this work.
+</div>
+</div>
 <div class=post>
 <h2 class="post-item post-title">
 <a href=https://lianglouise.github.io/post/quic_address_validation/>QUIC Address Validation</a>
@@ -144,18 +156,6 @@ In this post, I would present my analysis on what&rsquo;s most welcomed TV anime
 <p>A very classic use case of this framework is counting words in a large file, which is also what we are to implement.</p>
 </div>
 </div>
-<div class=post>
-<h2 class="post-item post-title">
-<a href=https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</a>
-</h2>
-<div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-11-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1099 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/web>web</a>&nbsp;<a href=/tags/security>security</a>&nbsp;</span>
-</div>
-<div class="post-item post-summary markdown-body">
-<p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.</p>
-<p>So what&rsquo;s next?</p>
-</div>
-</div>
 <div class=pagination>
 <div class="pag-item pag-current">
 <a href=/post/>1</a>
@@ -214,6 +214,9 @@ In this post, I would present my analysis on what&rsquo;s most welcomed TV anime
 </span>
 <span>
 <a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux/>Linux</a>
 </span>
 <span>
 <a href=/tags/linux-kernel/>linux kernel</a>
@@ -286,6 +289,9 @@ In this post, I would present my analysis on what&rsquo;s most welcomed TV anime
 </span>
 <span>
 <a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux/>Linux</a>
 </span>
 <span>
 <a href=/tags/linux-kernel/>linux kernel</a>

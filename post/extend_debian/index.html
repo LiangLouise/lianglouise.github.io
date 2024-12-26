@@ -16,13 +16,15 @@
 <meta name=msapplication-TileColor content="#da532c">
 <meta name=msapplication-config content="/favicon/browserconfig.xml">
 <meta name=theme-color content="#ffffff">
-<title>security - Roy's Repo</title>
+<title>Extend the disk size of a Debian qcow2 - Roy's Repo</title>
 <meta name=author content="Roy Liang">
-<meta name=description content="The Blog of Roy Liang">
-<meta property="og:title" content="security">
-<meta name=twitter:title content="security">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://lianglouise.github.io/tags/security/"><meta name=twitter:card content="summary"><meta property="og:updated_time" content="2020-11-10T23:13:55-05:00">
+<meta name=description content="Extend the disk size of a Linux VM">
+<meta name=keywords content="Linux">
+<meta property="og:title" content="Extend the disk size of a Debian qcow2 ">
+<meta name=twitter:title content="Extend the disk size of a Debian qcow2 ">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/extend_debian/"><meta property="og:description" content="Extend the disk size of a Linux VM">
+<meta name=twitter:description content="Extend the disk size of a Linux VM"><meta name=twitter:card content="summary"><meta property="article:published_time" content="2024-12-10T22:38:31-08:00"><meta property="article:modified_time" content="2024-12-10T22:38:31-08:00">
 <style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
 <link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
@@ -41,31 +43,79 @@
 <main>
 <div class="container-lg clearfix">
 <div class="col-12 col-md-9 float-left content">
-<div class=page-info>
-<span>Posts with the tag security: </span>
-</div>
-<div class=post>
+<article>
 <h2 class="post-item post-title">
-<a href=https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_2/>Some Practice on Implementing Signal Protocol With Python (2): Double Ratchet</a>
+<a href=https://lianglouise.github.io/post/extend_debian/>Extend the disk size of a Debian qcow2 </a>
 </h2>
 <div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-11-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1099 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/web>web</a>&nbsp;<a href=/tags/security>security</a>&nbsp;</span>
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2024-12-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;489 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/linux>Linux</a>&nbsp;</span>
 </div>
-<div class="post-item post-summary markdown-body">
-<p>After doing a handshake using X3DH, Both users can authenticate each other and agree on a shared master secret.</p>
-<p>So what&rsquo;s next?</p>
+<div class="post-content markdown-body">
+<p>Recently I am working on a project requiring me to pack some QEMU images for the CI purpose.
+As it&rsquo;s going be a VM which requires almost no changes after it&rsquo;s configured, I was hoping to minimize it as much as possible.
+The OS image I need to use is the Debian 12 image from the official Debian release <a href=https://cdimage.debian.org/images/cloud/ target=_blank>repo</a>.</p>
+<p>The softwares I installed required some disk space around 2G, which is more than the original disk space the image initially configured, so I decided to extend the disk to allocate more space directly as I really don&rsquo;t want to create an extra img file for this work.</p>
+<p>However, after following the existing tutorials to use <code>qemu-img</code> and <code>fdisk</code> to extend the disk, I found myself keep failing to reboot the system once the disk size is changed.
+Most tutorials or stackoverflow&rsquo;s answers indicate I need to update <code>/etc/fstab</code> to tell the kernel the new PARTUUID, which doesn&rsquo;t work at all after I updated PARTUUID of the partition <code>/</code> to the new one returned by <code>blkid</code>. It always complains that the PARTUUID doesn&rsquo;t match then rejects to boot the system.</p>
+<p>Only after I went through the boot arguments through <code>cat /proc/cmdline</code> in the initramfs mode, then I realized that the bootloader was keeping using the PARTUUID BEFORE the partition got extended.</p>
+<p>So Opening the grub cfg file which controls the boot orders and params we then can see that the root PARTUUID was hardcoded here as the <code>root</code> param in the start up cmd.</p>
+<pre><code>menuentry 'Debian GNU/Linux' --class debian --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-c27ec869-ac05-4efd-bdfa-c7b83e176149' {
+        load_video
+        insmod gzio
+        if [ x$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
+        insmod part_gpt
+        insmod ext2
+        set root='hd0,gpt1'
+        if [ x$feature_platform_search_hint = xy ]; then
+          search --no-floppy --fs-uuid --set=root --hint-bios=hd0,gpt1 --hint-efi=hd0,gpt1 --hint-baremetal=ahci0,gpt1  c27ec869-ac05-4efd-bdfa-c7b83e176149
+        else
+          search --no-floppy --fs-uuid --set=root c27ec869-ac05-4efd-bdfa-c7b83e176149
+        fi
+        echo    'Loading Linux 6.1.0-28-amd64 ...'
+        linux   /boot/vmlinuz-6.1.0-28-amd64 root=PARTUUID=1bd63af9-84e1-46f1-84de-ec62bcb5a427 ro console=tty0 console=ttyS0,115200 earlyprintk=ttyS0,115200 consoleblank=0
+        echo    'Loading initial ramdisk ...'
+        initrd  /boot/initrd.img-6.1.0-28-amd64
+}
+</code></pre>
+<blockquote>
+<p>boot entry from <code>/boot/grub/grub.cfg</code></p>
+</blockquote>
+<h2 id=steps-to-extend-the-root-partition>Steps to extend the root partition</h2>
+<p>As a summary, in order to extend the root partition in the qcow2 image, you need:</p>
+<ul>
+<li>
+<p>Extend the qcow2 image in the host.
+<code>qemu-img resize &lt;qcow2 img file name> &lt;new size></code></p>
+</li>
+<li>
+<p>boot the VM, in VM&rsquo;s terminal, use <code>fdisk</code> to resize the root partition.
+Delete the partition 1 that the root <code>/</code> mounts to, usually it would be <code>/dev/vda1</code>.
+Then recreate a new one from the same starting block with the new size.
+Write the result and exit <code>fdisk</code>.</p>
+</li>
+<li>
+<p>in VM&rsquo;s terminal, run <code>resize2fs /dev/vda1</code> to resize the file system</p>
+</li>
+<li>
+<p>in VM&rsquo;s terminal, run <code>blkid</code> to get the new <code>/dev/vda1</code>&rsquo;s PARTUUID.</p>
+</li>
+<li>
+<p>update the PARTUUID of root in <code>/etc/fstab</code> with the new id returned in the previous step.</p>
+</li>
+<li>
+<p>update the root&rsquo;s PARTTUID in <code>/boot/grub/grub.cfg</code>, you may globally replace all old
+root&rsquo;s PARTUUID in it with the new root&rsquo;s PARTUUID.</p>
+</li>
+<li>
+<p>Reboot the system and it should have no errors.</p>
+</li>
+</ul>
 </div>
-</div>
-<div class=post>
-<h2 class="post-item post-title">
-<a href=https://lianglouise.github.io/post/some_practice_on_implementing_signal_protocol_with_python_1/>Some Practice on Implementing Signal Protocol With Python (1): X3DH</a>
-</h2>
-<div class="post-item post-meta">
-<span><i class="iconfont icon-today-sharp"></i>&nbsp;2020-10-20</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;1636 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/web>web</a>&nbsp;<a href=/tags/security>security</a>&nbsp;</span>
-</div>
-<div class="post-item post-summary markdown-body">
-<p>Lately I was working on a Web Security Project and I came across this very interesting Web Messaging Encryption Protocol - <a href=https://signal.org/docs/ target=_blank>Signal Protocol</a>.</p>
-</div>
+</article>
+<div class="license markdown-body">
+<blockquote>
+<p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p>
+</blockquote>
 </div>
 </div>
 <aside class="col-12 col-md-3 float-left sidebar">
@@ -129,6 +179,12 @@
 </span>
 </div>
 </div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3><nav id=TableOfContents>
+<ul>
+<li><a href=#steps-to-extend-the-root-partition>Steps to extend the root partition</a></li>
+</ul>
+</nav></div>
 </aside>
 </div>
 <div class=btn>
@@ -203,6 +259,14 @@
 <a href=/tags/web/>web</a>
 </span>
 </div>
+</div>
+<div class="sidebar-item sidebar-toc">
+<h3>TOC</h3>
+<nav id=TableOfContents>
+<ul>
+<li><a href=#steps-to-extend-the-root-partition>Steps to extend the root partition</a></li>
+</ul>
+</nav>
 </div>
 </div>
 </aside>

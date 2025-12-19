@@ -1,0 +1,301 @@
+<!doctype html><html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<meta name=HandheldFriendly content="True">
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon/favicon-16x16.png>
+<link rel=manifest href=/favicon/site.webmanifest>
+<link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+<link rel="shortcut icon" href=/favicon/favicon.ico>
+<meta name=msapplication-TileColor content="#da532c">
+<meta name=msapplication-config content="/favicon/browserconfig.xml">
+<meta name=theme-color content="#ffffff">
+<title>Compile Cpprestsdk on Windows 11 - Roy's Repo</title>
+<meta name=author content="Roy Liang">
+<meta name=description content="The Blog of Roy Liang">
+<meta name=keywords content="MSVC,Windows">
+<meta property="og:title" content="Compile Cpprestsdk on Windows 11">
+<meta name=twitter:title content="Compile Cpprestsdk on Windows 11">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lianglouise.github.io/post/cpprestsdk_compile_on_windows/"><meta property="og:description" content="One of the projects I got to work on relied on an C++ REST SDK cpprestsdk from Microsoft, I need to build this library myself as we needed to modify the code a little bit. Though I have been working on C and C++ over the Linux platform for a few years, it’s my very first time working with MSVC over the Windows platform and this library. I knew that Visual C++ projects can be quite challenging to deal with, and as soon as I saw that this library is in maintenance mode, I could feel it would cause a lot of trouble.">
+<meta name=twitter:description content="One of the projects I got to work on relied on an C++ REST SDK cpprestsdk from Microsoft, I need to build this library myself as we needed to modify the code a little bit. Though I have been working on C and C++ over the Linux platform for a few years, it’s my very first time working with MSVC over the Windows platform and this library. I knew that Visual C++ projects can be quite challenging to deal with, and as soon as I saw that this library is in maintenance mode, I could feel it would cause a lot of trouble."><meta name=twitter:card content="summary"><meta property="article:published_time" content="2025-12-10T20:30:00-08:00"><meta property="article:modified_time" content="2025-12-10T20:30:00-08:00">
+<style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style>
+<link rel=stylesheet href=https://lianglouise.github.io/assets/css/fuji.min.css>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-BJCGN2DM5Q')</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BJCGN2DM5Q"></script>
+</head>
+<body data-theme=auto>
+<script data-cfasync=false>var fujiThemeData=localStorage.getItem('fuji_data-theme');fujiThemeData?fujiThemeData!=='auto'&&document.body.setAttribute('data-theme',fujiThemeData==='dark'?'dark':'light'):localStorage.setItem('fuji_data-theme','auto')</script>
+<header>
+<div class="container-lg clearfix">
+<div class="col-12 header">
+<a class=title-main href=https://lianglouise.github.io/>Roy's Repo</a>
+<span class=title-sub>Share some thoughts</span>
+</div>
+</div>
+</header>
+<main>
+<div class="container-lg clearfix">
+<div class="col-12 col-md-9 float-left content">
+<article>
+<h2 class="post-item post-title">
+<a href=https://lianglouise.github.io/post/cpprestsdk_compile_on_windows/>Compile Cpprestsdk on Windows 11</a>
+</h2>
+<div class="post-item post-meta">
+<span><i class="iconfont icon-today-sharp"></i>&nbsp;2025-12-10</span><span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;615 words</span><span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/msvc>MSVC</a>&nbsp;<a href=/tags/windows>Windows</a>&nbsp;</span>
+</div>
+<div class="post-content markdown-body">
+<p>One of the projects I got to work on relied on an C++ REST SDK <a href=https://github.com/microsoft/cpprestsdk target=_blank>cpprestsdk</a> from Microsoft, I need to build this library myself as we needed to modify the code a little bit. Though I have been working on C and C++ over the Linux platform for a few years, it’s my very first time working with MSVC over the Windows platform and this library. I knew that Visual C++ projects can be quite challenging to deal with, and as soon as I saw that this library is in maintenance mode, I could feel it would cause a lot of trouble. After spending a few hours with outdated documentation and confusing console outputs, I finally figured out how to build it on Windows 11.</p>
+<h2 id=environment>Environment</h2>
+<p>The machine I have is a Windows 11 x64 machine, with Visual Studio 2022 installed.</p>
+<p>The version I was trying to build was the tag <a href=https://github.com/microsoft/cpprestsdk/tree/v2.10.19 target=_blank>v2.10.19</a>.</p>
+<h2 id=how-to-compile>How to compile</h2>
+<h3 id=dependencies>Dependencies</h3>
+<p>Though it’s provided with <a href=https://github.com/Microsoft/cpprestsdk/wiki/How-to-build-for-Windows target=_blank>some doc</a> telling you how to build everything on different platforms, it didn’t take me much time to figure out it simply won’t work at the first step.</p>
+<pre><code>vcpkg install --triplet x64-windows zlib openssl boost-system boost-date-time boost-regex boost-interprocess websocketpp brotli
+</code></pre>
+<p>Visual Studio 2022’s vcpkg disabled classic mode, and the embed vcpkg is just too old to be compiled on Windows 11, so this is not very useful at all. So we will have to install dependencies using the manifest mode.</p>
+<p>You will need to create a vcpkg.json file at the project root:</p>
+<pre><code class=language-powershell>git clone https://github.com/microsoft/cpprestsdk.git
+cd cpprestsdk
+git checkout origin/v2.10.19
+vcpkg new --application
+</code></pre>
+<p>Then modify the newly created <code>vcpkg.json</code> and <code>vcpkg-configuration.json</code> as below:</p>
+<blockquote>
+<p>vcpkg.json</p>
+</blockquote>
+<pre><code class=language-json>{
+  &quot;name&quot;: &quot;cpprestsdk&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;dependencies&quot;: [
+    &quot;zlib&quot;,
+    &quot;openssl&quot;,
+    &quot;boost-system&quot;,
+    &quot;boost-date-time&quot;,
+    &quot;boost-regex&quot;,
+    &quot;boost-interprocess&quot;,
+    &quot;brotli&quot;,
+    &quot;websocketpp&quot;
+  ]
+}
+</code></pre>
+<blockquote>
+<p>vcpkg-configuration.json</p>
+</blockquote>
+<pre><code class=language-json>{
+  &quot;default-registry&quot;: {
+    &quot;kind&quot;: &quot;git&quot;,
+    &quot;baseline&quot;: &quot;b759049a36728d18260963799a56e6b19cb4a2ef&quot;,
+    &quot;repository&quot;: &quot;https://github.com/microsoft/vcpkg&quot;
+  },
+  &quot;registries&quot;: [
+    {
+      &quot;kind&quot;: &quot;artifact&quot;,
+      &quot;location&quot;: &quot;https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip&quot;,
+      &quot;name&quot;: &quot;microsoft&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Pay extra attention to <code>vcpkg-configuration.json</code> file. Ensure the baseline property is substituted to match the embed vcpkg’s commit SHA value in the cpprestsdk repo, it will definitely fetch dependencies of the wrong version from the latest vcpkg packages repo. Here in the tag <code>v2.10.19</code>, it would be <code>b759049a36728d18260963799a56e6b19cb4a2ef</code>. It took me quite a while to understand how vcpkg fetches the right version without specifying the version number.</p>
+<h3 id=building>Building</h3>
+<p>Before starting build, one more step we need to take. We need to lock the toolchain to v141 to let every dependency be happy if you are using a version higher than Visual Studio 2017.</p>
+<p>You will need go to the directory vcpkg hosts triplets cmake files, i.e. <code>x:\Microsoft Visual Studio\2022\Professional\VC\vcpkg\triplets</code> on my machine. Create a new triplet named <code>x64-windows-v141.cmake</code>.</p>
+<pre><code class=language-cmake>set(VCPKG_TARGET_ARCHITECTURE x64)
+set(VCPKG_CRT_LINKAGE dynamic)
+set(VCPKG_LIBRARY_LINKAGE dynamic)
+
+set(VCPKG_PLATFORM_TOOLSET v141)
+</code></pre>
+<p>Now we can use the Visual Studio&rsquo;s Cmake to build everything, ensuring you select the triplet we just created as the value for <code>VCPKG_TARGET_TRIPLET</code>.</p>
+<pre><code class=language-powershell># at the cpprestsdk repo root
+mkdir build
+cd build
+cmake ../Release -DCMAKE_TOOLCHAIN_FILE=&quot;&lt;path to vcpkg/scripts/buildsystems&gt;/vcpkg.cmake&quot; -DVCPKG_TARGET_TRIPLET=x64-windows-v141
+cmake --build . --config Release
+</code></pre>
+<p>You may see a lot of tests failed to compile, it’s because <code>&lt;chrono></code> is not explicitly included in the test code, and was exposed to the test code when it included other std headers. VS 2022 solved such accidental inclusions, making it fail to build. But I didn’t dig deep into it, so there may be other errors popping out.</p>
+<hr>
+<p>Thanks to AI, otherwise, it would be really hard to tell what do all of these confusing error logs mean over different compiler versions :( To be honest, the process of building this project really showed me how crazy it would be to switch between different versions of Microsoft’s C++ tool chain. And how annoying bad documentation can be!</p>
+</div>
+</article>
+</div>
+<aside class="col-12 col-md-3 float-left sidebar">
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/http/3/>HTTP/3</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux/>Linux</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/msvc/>MSVC</a>
+</span>
+<span>
+<a href=/tags/quic/>QUIC</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+<span>
+<a href=/tags/windows/>Windows</a>
+</span>
+</div>
+</div>
+</aside>
+</div>
+<div class=btn>
+<div class=btn-menu id=btn-menu>
+<i class="iconfont icon-grid-sharp"></i>
+</div>
+<div class=btn-toggle-mode>
+<i class="iconfont icon-contrast-sharp"></i>
+</div>
+<div class=btn-scroll-top>
+<i class="iconfont icon-chevron-up-circle-sharp"></i>
+</div>
+</div>
+<aside class=sidebar-mobile style=display:none>
+<div class=sidebar-wrapper>
+<div class="sidebar-item sidebar-pages">
+<h3>Pages</h3>
+<ul>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/archives/>Archives</a>
+</li>
+<li>
+<a href=/about/>About</a>
+</li>
+<li>
+<a href=/gpg_email/>Email</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-links">
+<h3>Links</h3>
+<ul>
+<li>
+<a href=https://github.com/lianglouise target=_blank><span>GitHub</span></a>
+</li>
+<li>
+<a href=https://www.linkedin.com/in/jiasong-liang target=_blank><span>Linkedin</span></a>
+</li>
+</ul>
+</div>
+<div class="sidebar-item sidebar-tags">
+<h3>Tags</h3>
+<div>
+<span>
+<a href=/tags/data-structure/>data structure</a>
+</span>
+<span>
+<a href=/tags/distributed-system/>Distributed System</a>
+</span>
+<span>
+<a href=/tags/http/3/>HTTP/3</a>
+</span>
+<span>
+<a href=/tags/intro/>Intro</a>
+</span>
+<span>
+<a href=/tags/linux/>Linux</a>
+</span>
+<span>
+<a href=/tags/linux-kernel/>linux kernel</a>
+</span>
+<span>
+<a href=/tags/msvc/>MSVC</a>
+</span>
+<span>
+<a href=/tags/quic/>QUIC</a>
+</span>
+<span>
+<a href=/tags/security/>security</a>
+</span>
+<span>
+<a href=/tags/web/>web</a>
+</span>
+<span>
+<a href=/tags/windows/>Windows</a>
+</span>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<footer>
+<div class="container-lg clearfix">
+<div class="col-12 footer">
+<span>&copy; 2019-2025
+<a href=https://lianglouise.github.io/>Roy Liang</a>
+| <a href=https://github.com/LiangLouise/lianglouise.github.io>Source code</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a>
+</span>
+</div>
+</div>
+</footer>
+<script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.0/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js onload=renderMathInElement(document.body)></script>
+</body>
+</html>

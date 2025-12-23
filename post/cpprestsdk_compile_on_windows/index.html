@@ -118,7 +118,7 @@ set(VCPKG_PLATFORM_TOOLSET v141)
 <pre><code class=language-powershell># at the cpprestsdk repo root
 mkdir build
 cd build
-cmake ../Release -DCMAKE_TOOLCHAIN_FILE=&quot;&lt;path to vcpkg/scripts/buildsystems&gt;/vcpkg.cmake&quot; -DVCPKG_TARGET_TRIPLET=x64-windows-v141
+cmake .. -DCMAKE_TOOLCHAIN_FILE=&quot;&lt;path to vcpkg/scripts/buildsystems&gt;/vcpkg.cmake&quot; -DVCPKG_TARGET_TRIPLET=x64-windows-v141
 cmake --build . --config Release
 </code></pre>
 <p>You may see a lot of tests failed to compile, it’s because <code>&lt;chrono></code> is not explicitly included in the test code, and was exposed to the test code when it included other std headers. VS 2022 solved such accidental inclusions, making it fail to build. But I didn’t dig deep into it, so there may be other errors popping out.</p>
